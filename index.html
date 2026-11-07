@@ -52,15 +52,19 @@ nav .collect.on{color:var(--ink)}
 
 /* map */
 #map{height:100%}
-.map-card{position:absolute;left:12px;right:12px;bottom:12px;z-index:400;background:var(--card);border-radius:var(--r);box-shadow:0 6px 24px rgba(0,0,0,.18);display:flex;gap:12px;padding:10px;align-items:center;cursor:pointer;border:0;text-align:left;max-width:520px;margin:0 auto}
+.map-card{position:absolute;left:12px;right:12px;bottom:32px;z-index:400;background:var(--card);color:var(--ink);border-radius:var(--r);box-shadow:0 6px 24px rgba(0,0,0,.18);display:flex;gap:10px;padding:10px;align-items:center;max-width:520px;margin:0 auto}
 .map-card[hidden]{display:none}
-.map-card img{width:64px;height:64px;border-radius:12px;flex:none}
+.mc-main{display:flex;gap:12px;align-items:center;flex:1;min-width:0;border:0;background:none;padding:0;text-align:left;cursor:pointer}
+.mc-dir{flex:none;min-height:44px;padding:8px 12px}
 .map-card b{font-family:var(--hfont);font-size:1.05rem;display:block}
 .map-card small{color:var(--muted)}
+.near{position:absolute;left:12px;top:12px;z-index:400;min-height:48px;padding:0 14px;border-radius:14px;border:0;background:var(--card);color:var(--ink);box-shadow:var(--shadow);font:600 .95rem var(--hfont);cursor:pointer}
+.near[hidden]{display:none}
 .pin{background:none;border:0}
-.pin div{width:34px;height:34px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:var(--brand-2);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);display:grid;place-items:center}
-.pin div i{transform:rotate(45deg);color:#fff;font:700 .78rem var(--hfont);font-style:normal}
-.pin.got div{background:var(--accent)}.pin.got div i{color:var(--accent-ink)}
+/* 44px tap box around a 34px pin */
+.pin div{width:34px;height:34px;margin:5px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:var(--brand-2);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);display:grid;place-items:center}
+.pin div i{transform:rotate(45deg);color:#fff;font:700 .78rem var(--hfont);font-style:normal;white-space:nowrap}
+.pin.got div{background:var(--accent)}.pin.got div i{color:var(--accent-ink);font-size:.66rem;letter-spacing:-.3px}
 .pin.sel div{outline:3px solid var(--heather)}
 .me{width:18px;height:18px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 7px rgba(26,115,232,.25)}
 .fab{position:absolute;right:12px;top:12px;z-index:400;width:48px;height:48px;border-radius:14px;border:0;background:var(--card);box-shadow:var(--shadow);cursor:pointer;display:grid;place-items:center}
@@ -76,8 +80,10 @@ nav .collect.on{color:var(--ink)}
 .tile{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);border:0;padding:0;text-align:left;cursor:pointer;position:relative}
 .pic{display:block;position:relative;background:#cfdcf0;aspect-ratio:1;overflow:hidden}
 /* photo softened (blur + darker) so the statue pops; statue gets a white rim and drop shadow */
-.pic::before,.hero::before{content:'';position:absolute;inset:-8px;background:var(--photo) center/cover no-repeat;filter:blur(1.2px) brightness(.75) saturate(.85)}
+.hero::before{content:'';position:absolute;inset:-8px;background:var(--photo) center/cover no-repeat;filter:blur(1.2px) brightness(.75) saturate(.85)}
 .pic img{position:relative;width:100%;height:100%;object-fit:cover;display:block;filter:drop-shadow(0 0 1.5px rgba(255,255,255,.95)) drop-shadow(0 8px 10px rgba(0,0,0,.5))}
+/* grid/cards use a ~20 KB thumbnail (photos/thumbs); the full photo is only loaded on the detail page */
+.pic img.bg{position:absolute;left:-8px;top:-8px;width:calc(100% + 16px);height:calc(100% + 16px);filter:blur(1.2px) brightness(.75) saturate(.85)}
 #stage canvas{filter:drop-shadow(0 0 2px rgba(255,255,255,.9)) drop-shadow(0 14px 18px rgba(0,0,0,.5))}
 .hero{overflow:hidden}
 .pic .code{position:absolute;left:6px;bottom:6px;background:#1b2440;color:#f6dc8a;font:800 .8rem/1 Inter,sans-serif;letter-spacing:1px;padding:4px 6px;border-radius:7px}
@@ -101,6 +107,7 @@ nav .collect.on{color:var(--ink)}
 .digits span{width:58px;height:70px;border-radius:14px;background:var(--card);border:2px solid var(--line);display:grid;place-items:center;font:700 2rem var(--hfont)}
 .digits span.f{border-color:var(--brand-2)}
 .digits.bad{animation:shake .35s}
+.digits.err span,.codebox input.err{border-color:#d64545}
 @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 .pad{display:grid;grid-template-columns:repeat(3,78px);gap:12px}
 .pad button{height:64px;border-radius:16px;border:0;background:var(--card);box-shadow:var(--shadow);font:600 1.5rem var(--hfont);cursor:pointer}
@@ -120,7 +127,7 @@ nav .collect.on{color:var(--ink)}
 .star svg{width:40px;height:40px}
 .star b{display:block;font-family:var(--hfont);font-size:.95rem;margin-top:4px}
 .star small{color:var(--muted)}
-.star:not(.got){opacity:.5}.star:not(.got) svg path{fill:var(--line)}
+.star:not(.got){opacity:.85}.star:not(.got) svg path{fill:none;stroke:var(--muted);stroke-width:1.6}
 .info{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);margin-bottom:10px}
 .info h3{font-size:1.02rem;margin-bottom:4px}.info p{margin:0;color:var(--muted)}
 .steps{counter-reset:s;list-style:none;padding:0;margin:0}
@@ -135,7 +142,7 @@ nav .collect.on{color:var(--ink)}
 /* detail sheet */
 #sheet,#paint{position:fixed;inset:0;z-index:1100;background:var(--bg);display:none;flex-direction:column;overflow:auto}
 #sheet.on,#paint.on{display:flex}
-.hero{position:relative;height:64vh;min-height:320px;flex:none;background:radial-gradient(circle at 50% 35%,#ffffff,#d9e2f5 70%)}
+.hero{position:relative;height:46vh;min-height:260px;flex:none;background:radial-gradient(circle at 50% 35%,#ffffff,#d9e2f5 70%)}
 @media (prefers-color-scheme:dark){.hero{background:radial-gradient(circle at 50% 35%,#2c3a63,#0d1222 75%)}}
 #stage{position:absolute;inset:0}
 .hbar{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:12px;padding-top:calc(12px + env(safe-area-inset-top));z-index:2;pointer-events:none}
@@ -159,7 +166,11 @@ nav .collect.on{color:var(--ink)}
 .acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
 .loc{display:flex;gap:12px;align-items:flex-start}
 .loc svg{flex:none;width:22px;height:22px;stroke:var(--heather);fill:none;stroke-width:2;margin-top:2px}
-.fav{border:0;background:none;cursor:pointer;font-size:1.6rem;line-height:1;padding:6px;min-width:44px;min-height:44px}
+.fav{border:0;background:none;cursor:pointer;line-height:0;padding:6px;min-width:44px;min-height:44px;color:var(--ink)}
+.fav svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2}.fav[aria-pressed=true] svg{fill:#e23d4f;stroke:#b3162a}
+/* Collect box sticks to the bottom of the detail page until scrolled into place, so it is never below the fold */
+.collectbar{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom));z-index:3;box-shadow:0 6px 24px rgba(0,0,0,.22)}
+.collectbar h3{margin-bottom:6px}
 .codebox{display:flex;gap:8px;margin-top:10px}
 .codebox input{flex:1;min-height:48px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:700 1.3rem var(--hfont);letter-spacing:8px;text-align:center}
 .credit{font-size:.72rem;color:var(--muted);margin-top:18px}.credit a{color:inherit}
@@ -178,7 +189,12 @@ nav .collect.on{color:var(--ink)}
 #splash .steps{text-align:left;max-width:320px;margin-bottom:28px}
 .leaflet-control-attribution{font-size:10px}
 body:has(.wg-screen.wg-on) #game-exit{display:none!important}
-.clu{width:40px;height:40px;border-radius:50%;background:#1b2440;color:#f6dc8a;border:3px solid #fff;display:grid;place-items:center;font:800 1rem var(--hfont);box-shadow:0 3px 10px rgba(0,0,0,.35)}
+/* cluster = white pill with a paw and "8 Westies", so it can't be mistaken for Westie No. 8 */
+.clu{width:100%;height:100%;border-radius:16px;background:#fff;color:#14275a;border:3px solid #14275a;display:flex;flex-direction:column;align-items:center;justify-content:center;font:600 .68rem/1 var(--hfont);white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.35)}
+.clu b{display:flex;align-items:center;gap:2px;font:700 1rem/1.05 var(--hfont)}
+.clu svg{width:16px;height:16px;fill:currentColor;flex:none}
+.hbtn{width:44px;height:44px;flex:none;border-radius:50%;border:2px solid rgba(255,255,255,.7);background:none;color:#fff;font:700 1.2rem var(--hfont);cursor:pointer}
+#splash[hidden]{display:none}
 .leaflet-cluster-anim .leaflet-marker-icon,.leaflet-cluster-anim .leaflet-marker-shadow{transition:transform .3s ease-out,opacity .3s ease-in}
 /* quiz, passport, painter, confetti, toast */
 .quiz{display:grid;gap:8px;margin:0 0 14px}
@@ -199,11 +215,15 @@ body:has(.wg-screen.wg-on) #game-exit{display:none!important}
 #a2hs{position:fixed;z-index:700;left:12px;right:12px;top:calc(var(--head) + 10px + env(safe-area-inset-top));max-width:460px;margin:0 auto;background:var(--accent);color:var(--accent-ink);border-radius:16px;padding:12px 44px 12px 14px;box-shadow:0 8px 24px rgba(0,0,0,.3);font-size:.9rem;display:flex;flex-direction:column;gap:2px}
 #a2hs[hidden]{display:none}
 #a2hs svg{vertical-align:-3px}
-#a2hs-x{position:absolute;top:4px;right:4px;width:40px;height:40px;border:0;background:none;color:inherit;font-size:1.1rem;cursor:pointer}
+#a2hs-x{position:absolute;top:2px;right:2px;width:44px;height:44px;border:0;background:none;color:inherit;font-size:1.1rem;cursor:pointer}
 @media (orientation:landscape) and (max-height:560px){#a2hs{top:10px}}
 /* phone sideways on the Game tab: game goes full screen (header/nav hidden), ← Back returns to the map */
 body[data-tab=game] #game-exit{display:grid}
 #game-exit{display:none;position:fixed;z-index:600;right:calc(12px + env(safe-area-inset-right));bottom:calc(var(--nav) + 12px + env(safe-area-inset-bottom));height:44px;padding:0 16px;border-radius:99px;border:2px solid rgba(255,255,255,.8);background:rgba(16,22,36,.78);color:#fff;font:600 .95rem var(--hfont);white-space:nowrap;cursor:pointer;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+/* while a level is being played (no menu card showing): game gets the whole screen, the Add-to-Home tip only shows on the menu */
+body[data-tab=game]:not(:has(.wg-screen.wg-on)) header,body[data-tab=game]:not(:has(.wg-screen.wg-on)) nav,body:not(:has(.wg-screen.wg-on)) #a2hs{display:none}
+body[data-tab=game]:not(:has(.wg-screen.wg-on)) main{top:env(safe-area-inset-top);bottom:0}
+body[data-tab=game]:not(:has(.wg-screen.wg-on)) #game-exit{bottom:calc(12px + env(safe-area-inset-bottom))}
 @media (orientation:landscape) and (max-height:560px){
   body[data-tab=game] header,body[data-tab=game] nav{display:none}
   body[data-tab=game] main{top:0;bottom:0;left:env(safe-area-inset-left);right:env(safe-area-inset-right)}
@@ -234,13 +254,15 @@ body[data-tab=game] #game-exit{display:grid}
   <svg class="logo"><use href="#logo"/></svg>
   <h1>Westies of Ayr<small>Art trail</small></h1>
   <span class="pill" id="prog"></span>
+  <button class="hbtn" id="help" aria-label="Help: how the trail works">?</button>
 </header>
 
 <main>
   <section class="view on" id="v-map">
     <div id="map"></div>
     <button class="fab" id="locate" aria-label="Show my location"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
-    <button class="map-card" id="mapcard" hidden></button>
+    <button class="near" id="near" hidden></button>
+    <div class="map-card" id="mapcard" hidden></div>
   </section>
   <section class="view" id="v-list">
     <div class="search"><label class="sr" for="q">Search Westies</label><input id="q" type="search" placeholder="Search by name, artist or place"></div>
@@ -335,7 +357,9 @@ WestieStatue.designs.forEach((d, i) => d.id = i);
 const LOCS = window.LOCATIONS, D = WestieStatue.designs, N = LOCS.length;
 // 4-digit code on each plaque, by stop. shortcut: codes live in page source, move server-side if prizes are at stake.
 // Bump on every publish; shown on the Progress tab.
-const APP_VERSION = '1.6';
+const APP_VERSION = '1.7';
+// offline: sw.js caches the app; its cache name comes from ?v=, so bumping APP_VERSION also refreshes the cache
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js?v=' + APP_VERSION).catch(e => console.warn('service worker', e));
 const CODES = ['4821','1739','6054','2917','8362','5408','3176','9625','7043','1588','6297','4130','8814','2569','7351','3942','5786','9013','1264','6679','3508','8247','4695','2031','7920','5317','9468','1852','6143','3790','8576'];
 const NEAR_M = 40;
 const $ = id => document.getElementById(id);
@@ -349,8 +373,8 @@ const thumbs = D.map(d => WestieStatue.thumb(d.id, 300));
 // Statue pictures: each design rendered on its plinth (transparent PNG) over the stop's street photo.
 // Pattern swatch shows until the render is ready; renders run one at a time in the background.
 const shots = [];
-const photo = i => { const p = (window.PHOTO_CREDITS || []).find(p => p.n === i + 1); return p ? `photos/${p.file.split('/').pop()}` : ''; };
-const pic = (i, cls = '') => `<span class="pic ${cls}" style="--photo:${photo(i) ? `url('${photo(i)}')` : 'none'}"><img data-pic="${i}" src="${shots[i] || thumbs[i]}" alt="Statue No. ${i + 1}"><b class="code" aria-label="Code ${CODES[i]}">${CODES[i]}</b></span>`;
+const photo = i => { const p = (window.PHOTO_CREDITS || []).find(p => p.n === i + 1); return p ? `photos/thumbs/${p.file.split('/').pop()}` : ''; };
+const pic = (i, cls = '') => `<span class="pic ${cls}">${photo(i) ? `<img class="bg" src="${photo(i)}" alt="" loading="lazy" decoding="async">` : ''}<img data-pic="${i}" src="${shots[i] || thumbs[i]}" alt="${esc(D[i].name)}, statue No. ${i + 1}"><b class="code" aria-label="Plaque code ${CODES[i]}">${CODES[i]}</b></span>`;
 function renderShots() {
   const box = document.createElement('div');
   box.style.cssText = 'position:fixed;left:-2000px;top:0;width:360px;height:360px';
@@ -366,9 +390,11 @@ function renderShots() {
 }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-// splash: shown on first visit only
-if (load('westie-seen', false)) $('splash').remove();
-else $('go').onclick = () => { store('westie-seen', true); $('splash').classList.add('hide'); setTimeout(() => $('splash').remove(), 450); };
+// splash: shown on first visit, and again from the header's ? button
+const hideSplash = () => { $('splash').classList.add('hide'); setTimeout(() => $('splash').hidden = true, 450); };
+if (load('westie-seen', false)) $('splash').hidden = true;
+$('go').onclick = () => { store('westie-seen', true); hideSplash(); };
+$('help').onclick = () => { $('splash').hidden = false; $('splash').classList.remove('hide'); $('go').focus(); };
 
 // ---------- tabs + back button history ----------
 let tab = 'map', game = null;
@@ -404,22 +430,40 @@ addEventListener('popstate', e => {
 const map = L.map('map', { zoomControl: false }).setView([55.455, -4.63], 13);
 // OSM tiles block file:// pages (no referer) and CARTO now needs a key, so use Esri's keyless street map
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles © Esri' }).addTo(map);
-L.polyline(LOCS.map(l => [l.lat, l.lng]), { color: '#8e5bb5', weight: 4, opacity: .55, dashArray: '2 9', lineCap: 'round' }).addTo(map);
+// trail line: white casing under a bold dotted purple line, readable in sunlight
+const trail = LOCS.map(l => [l.lat, l.lng]);
+L.polyline(trail, { color: '#fff', weight: 9, opacity: .85, lineCap: 'round', lineJoin: 'round', interactive: false }).addTo(map);
+L.polyline(trail, { color: '#6a3a9e', weight: 6, opacity: 1, dashArray: '1 11', lineCap: 'round', interactive: false }).addTo(map);
 let sel = null;
-const cluster = L.markerClusterGroup ? L.markerClusterGroup({ maxClusterRadius: 36, showCoverageOnHover: false, spiderfyOnMaxZoom: true, iconCreateFunction: c => L.divIcon({ className: '', html: `<div class="clu">${c.getChildCount()}</div>`, iconSize: [40, 40] }) }) : null;
+const PAW = '<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="16.5" rx="5.2" ry="4.4"/><circle cx="5" cy="10.5" r="2.3"/><circle cx="9.3" cy="6" r="2.3"/><circle cx="14.7" cy="6" r="2.3"/><circle cx="19" cy="10.5" r="2.3"/></svg>';
+// pins stop grouping at street zoom (17+), so neighbours separate
+const cluster = L.markerClusterGroup ? L.markerClusterGroup({ maxClusterRadius: 60, disableClusteringAtZoom: 17, showCoverageOnHover: false, spiderfyOnMaxZoom: true, iconCreateFunction: c => L.divIcon({ className: '', html: `<div class="clu" role="img" aria-label="${c.getChildCount()} Westies here, tap to zoom in"><b>${PAW}${c.getChildCount()}</b>Westies</div>`, iconSize: [60, 46] }) }) : null;
 const markers = LOCS.map((l, i) => L.marker([l.lat, l.lng], { title: D[i].name, keyboard: true }).on('click', () => pick(i)).addTo(cluster || map));
 if (cluster) map.addLayer(cluster);
 map.fitBounds(L.latLngBounds(LOCS.map(l => [l.lat, l.lng])), { padding: [30, 30] });
 map.on('click', () => { sel = null; $('mapcard').hidden = true; pins(); });
-function pick(i) {
-  sel = i; pins();
-  const c = $('mapcard'); c.hidden = false;
-  c.innerHTML = `${pic(i, 'sm')}<span><small>No. ${i + 1}${found[i] ? ' · Collected ✓' : ''}</small><b>${esc(D[i].name)}</b><small>${esc(LOCS[i].place)}</small></span>`;
-  c.onclick = () => open(i);
+const dist = i => { const m = map.distance(me, [LOCS[i].lat, LOCS[i].lng]); return m < 1000 ? Math.round(m / 10) * 10 + ' m' : (m / 1000).toFixed(1) + ' km'; };
+// Directions: destination only. Never put the user's own location in a URL.
+const dirUrl = i => `https://www.google.com/maps/dir/?api=1&travelmode=walking&destination=${LOCS[i].lat},${LOCS[i].lng}`;
+function pick(i) { sel = i; pins(); card(); }
+function card() {
+  const i = sel, c = $('mapcard'); c.hidden = false;
+  c.innerHTML = `<button class="mc-main">${pic(i, 'sm')}<span><small>No. ${i + 1}${found[i] ? ' · Collected ✓' : ''}${me ? ' · ' + dist(i) : ''}</small><b>${esc(D[i].name)}</b><small>${esc(LOCS[i].place)}</small></span></button>
+    <a class="btn ghost mc-dir" href="${dirUrl(i)}" target="_blank" rel="noopener" aria-label="Directions to No. ${i + 1}">Directions</a>`;
+  c.querySelector('.mc-main').onclick = () => open(i);
 }
 function pins() {
-  markers.forEach((m, i) => m.setIcon(L.divIcon({ className: 'pin' + (found[i] ? ' got' : '') + (sel === i ? ' sel' : ''), html: `<div><i>${found[i] ? '✓' : i + 1}</i></div>`, iconSize: [34, 34], iconAnchor: [17, 34] })));
+  markers.forEach((m, i) => m.setIcon(L.divIcon({ className: 'pin' + (found[i] ? ' got' : '') + (sel === i ? ' sel' : ''),
+    html: `<div><i aria-hidden="true">${i + 1}${found[i] ? '✓' : ''}</i><span class="sr">No. ${i + 1}, ${esc(D[i].name)}${found[i] ? ', collected' : ''}</span></div>`, iconSize: [44, 44], iconAnchor: [22, 39] })));
 }
+// nearest Westie still to find (any, once all are found); needs location, so only after the locate tap
+function nearest() {
+  const todo = LOCS.map((l, i) => i).filter(i => !found[i]), pool = todo.length ? todo : LOCS.map((l, i) => i);
+  const i = pool.reduce((a, b) => map.distance(me, [LOCS[b].lat, LOCS[b].lng]) < map.distance(me, [LOCS[a].lat, LOCS[a].lng]) ? b : a);
+  const b = $('near'); b.hidden = false; b.textContent = `Nearest: No. ${i + 1} · ${dist(i)}`;
+  b.onclick = () => { map.setView([LOCS[i].lat, LOCS[i].lng], 17); pick(i); };
+}
+function onMe() { nearest(); if (sel != null && !$('mapcard').hidden) card(); }
 
 // location is only asked for on a tap (file:// pages can't remember the permission)
 let me = null, meMarker = null, watching = false;
@@ -429,12 +473,12 @@ function locate(then, fail) {
     me = [p.coords.latitude, p.coords.longitude];
     if (!meMarker) meMarker = L.marker(me, { icon: L.divIcon({ className: '', html: '<div class="me"></div>', iconSize: [18, 18] }) }).addTo(map);
     else meMarker.setLatLng(me);
-    if (!watching) { watching = true; navigator.geolocation.watchPosition(q => { me = [q.coords.latitude, q.coords.longitude]; meMarker.setLatLng(me); }, () => {}, { enableHighAccuracy: true }); }
-    then();
+    if (!watching) { watching = true; navigator.geolocation.watchPosition(q => { me = [q.coords.latitude, q.coords.longitude]; meMarker.setLatLng(me); onMe(); }, () => {}, { enableHighAccuracy: true }); }
+    onMe(); then();
   }, () => fail('Location is blocked. Use the plaque code instead.'), { enableHighAccuracy: true, timeout: 15000 });
 }
 $('locate').onclick = () => locate(() => map.setView(me, 16), t => alertLine(t));
-function alertLine(t) { const c = $('mapcard'); c.hidden = false; c.innerHTML = `<span><b>Location</b><small>${esc(t)}</small></span>`; c.onclick = null; }
+function alertLine(t) { const c = $('mapcard'); c.hidden = false; c.innerHTML = `<span><b>Location</b><small>${esc(t)}</small></span>`; }
 
 // ---------- list ----------
 let filter = 'all';
@@ -457,7 +501,8 @@ let entry = '';
 $('pad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '⌫'].map(k => k === '' ? '<span></span>' : `<button data-k="${k}" class="${k === '⌫' ? 'del' : ''}" aria-label="${k === '⌫' ? 'Delete' : k}">${k}</button>`).join('');
 $('pad').onclick = e => {
   const k = e.target.closest('button'); if (!k) return;
-  entry = k.dataset.k === '⌫' ? entry.slice(0, -1) : (entry + k.dataset.k).slice(0, 4);
+  $('digits').classList.remove('err');
+  entry =k.dataset.k === '⌫' ? entry.slice(0, -1) : (entry + k.dataset.k).slice(0, 4);
   digits();
   if (entry.length === 4) setTimeout(submit, 150);
 };
@@ -466,7 +511,7 @@ function digits() { [...$('digits').children].forEach((s, i) => { s.textContent 
 function submit() {
   const i = CODES.indexOf(entry);
   const m = $('cmsg');
-  if (i < 0) { m.textContent = 'That code isn\'t right. Check the plaque and try again.'; $('digits').classList.add('bad'); setTimeout(() => $('digits').classList.remove('bad'), 400); }
+  if (i < 0) { m.textContent = 'That code isn\'t right. Check the plaque and try again.'; $('digits').classList.add('bad', 'err'); setTimeout(() => $('digits').classList.remove('bad'), 400); }
   else if (found[i]) m.textContent = `You already collected No. ${i + 1}, ${D[i].name}.`;
   else { m.textContent = ''; collect(i); }
   entry = ''; digits();
@@ -629,17 +674,17 @@ function open(i, fromHistory) {
   $('info').innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
       <span class="kicker${found[cur] ? ' got' : ''}">No. ${cur + 1}${found[cur] ? ' · Collected' : ''}</span>
-      <button class="fav" id="fav" aria-pressed="${!!favs[cur]}" aria-label="Favourite">${favs[cur] ? '❤️' : '🤍'}</button></div>
+      <button class="fav" id="fav" aria-pressed="${!!favs[cur]}" aria-label="Favourite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.4-4.5-9.5-9.1C1 8.5 3.1 4.6 6.8 4.6c2.1 0 3.6 1.1 5.2 3 1.6-1.9 3.1-3 5.2-3 3.7 0 5.8 3.9 4.3 7.3C19.4 16.5 12 21 12 21z"/></svg></button></div>
     <h2 id="s-title">${esc(d.name)}</h2>
     <p class="by">by ${esc(d.artist)}</p>
     <div class="info"><p>${esc(d.blurb)}</p>
       <div class="loc" style="margin-top:8px"><svg viewBox="0 0 24 24"><path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
       <div><h3>${esc(l.place)}</h3><p>${esc(l.desc)}</p></div></div></div>
     <div class="acts">
-      <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&travelmode=walking&destination=${l.lat},${l.lng}" target="_blank" rel="noopener">Directions</a>
+      <a class="btn ghost" href="${dirUrl(cur)}" target="_blank" rel="noopener">Directions</a>
       ${found[cur] ? `<span class="btn" style="background:var(--ok)">✓ ${new Date(found[cur]).toLocaleDateString('en-GB')}</span>` : '<button class="btn y" id="gps">I\'m here</button>'}
     </div>
-    ${found[cur] ? '' : `<div class="info">
+    ${found[cur] ? '' : `<div class="info collectbar"><h3>Collect this Westie</h3>
       <div class="codebox" style="margin-top:0"><label class="sr" for="code">4-digit plaque code</label><input id="code" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="Plaque code"><button class="btn" id="chk">Collect</button></div>
       <p class="cmsg" id="msg" role="status"></p></div>`}
     <p class="credit">${ph ? `Photo: <a href="${esc(ph.source_url)}" target="_blank" rel="noopener">${esc(ph.title)}</a> by ${esc(ph.author)}, <a href="${esc(ph.licence_url)}" target="_blank" rel="noopener">${esc(ph.licence)}</a>.<br>` : ''}${WestieStatue.credit ? '3D model: ' + esc(WestieStatue.credit) : ''}</p>`;
@@ -653,7 +698,8 @@ function open(i, fromHistory) {
       m <= NEAR_M ? collect(cur) : msg(`You're ${m} m away. Get within ${NEAR_M} m or use the plaque code.`);
     }, msg);
   };
-  $('chk').onclick = () => $('code').value.trim() === CODES[cur] ? collect(cur) : msg('That code doesn\'t match this Westie.');
+  $('code').oninput = () => $('code').classList.remove('err');
+  $('chk').onclick = () => $('code').value.trim() === CODES[cur] ? collect(cur) : ($('code').classList.add('err'), msg('That code doesn\'t match this Westie.'));
 }
 const close = () => history.state && history.state.s != null ? history.back() : sheet.classList.remove('on');
 $('s-close').onclick = close;
@@ -696,7 +742,7 @@ console.assert(D.every((d, i) => { const q = quiz(i), q2 = quiz(i); return new S
 render();
 setTimeout(renderShots, 300);
 // index.html#s5 opens statue 5 (for QR codes on plinths)
-const h = location.hash.match(/^#s(\d+)$/); if (h) { $('splash') && $('splash').remove(); open(+h[1] - 1); }
+const h = location.hash.match(/^#s(\d+)$/); if (h) { $('splash').hidden = true; open(+h[1] - 1); }
 </script>
 </body>
 </html>
