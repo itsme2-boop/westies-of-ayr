@@ -376,7 +376,7 @@ function show(v) {
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   $('a2hs').hidden = !(v === 'game' && ios && !navigator.standalone && !load('westie-a2hs-off', false));
   if (v === 'game' && window.WestieGame) game ? game.resume() : (game = WestieGame.mount($('game')));
-  else if (game) game.pause();
+  else if (game) { game.dispose(); game = null; $('game').innerHTML = ''; } // any way out of the Game tab ends the run
 }
 history.replaceState({ v: 'map' }, '');
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
@@ -386,7 +386,7 @@ document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
 });
 $('a2hs-x').onclick = () => { store('westie-a2hs-off', true); $('a2hs').hidden = true; };
 // leaving ends the run: next visit to the Game tab starts fresh at the level menu
-$('game-exit').onclick = () => { if (game) { game.dispose(); game = null; $('game').innerHTML = ''; } document.querySelector('nav [data-v=map]').click(); };
+$('game-exit').onclick = () => document.querySelector('nav [data-v=map]').click(); // show() ends the game
 addEventListener('popstate', e => {
   const s = e.state || { v: 'map' };
   sheet.classList.toggle('on', s.s != null); $('paint').classList.remove('on');
