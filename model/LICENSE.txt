@@ -1,0 +1,13 @@
+Westie 3D model
+================
+Source:  https://www.printables.com/model/1802492-westie  (file: Westie.stl)
+Author:  Ozyon (https://www.printables.com/@Ozyon)
+Licence: Creative Commons Attribution-NonCommercial 4.0 (CC BY-NC 4.0)
+         https://creativecommons.org/licenses/by-nc/4.0/
+Fetched: 2026-11-06
+
+Changes: original 514,042-triangle STL welded and simplified to 80,000 triangles
+(meshoptimizer), saved as westie.glb, and embedded as base64 in westie-model.js.
+The statue app re-orients and scales it and paints trail designs onto it.
+
+Non-commercial use only. Attribution string shown in the app: WestieStatue.credit

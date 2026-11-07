@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14275a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Westies">
+<title>Westies of Ayr</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --brand:#14275a;--brand-2:#1f3b8a;--accent:#f4b41a;--accent-ink:#3a2a00;--heather:#8e5bb5;
+  --bg:#f3f5fa;--card:#fff;--ink:#16203a;--muted:#5f6886;--line:#e3e7f1;--ok:#1d9a63;
+  --shadow:0 2px 10px rgba(20,39,90,.08);--r:18px;--nav:72px;--head:60px;
+  --hfont:'Fredoka',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1222;--card:#171e33;--ink:#e9ecf6;--muted:#9aa3c0;--line:#28304a;--shadow:0 2px 10px rgba(0,0,0,.35)}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+h1,h2,h3{font-family:var(--hfont);font-weight:600;margin:0;letter-spacing:.2px}
+button{font:inherit;color:inherit}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* header */
+header{position:fixed;top:0;left:0;right:0;height:calc(var(--head) + env(safe-area-inset-top));padding-top:env(safe-area-inset-top) !important;background:var(--brand);color:#fff;display:flex;align-items:center;gap:10px;padding:0 16px;z-index:500;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.logo{width:38px;height:38px;flex:none}
+header h1{font-size:1.2rem;flex:1;line-height:1.1}
+header h1 small{display:block;font:500 .7rem Inter,sans-serif;opacity:.75;letter-spacing:.6px;text-transform:uppercase}
+.pill{background:var(--accent);color:var(--accent-ink);font-weight:700;font-family:var(--hfont);padding:4px 12px;border-radius:99px;font-size:.95rem;white-space:nowrap}
+
+main{position:absolute;top:calc(var(--head) + env(safe-area-inset-top));bottom:calc(var(--nav) + env(safe-area-inset-bottom));left:0;right:0;overflow:auto}
+.view{display:none;height:100%}.view.on{display:block}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+
+/* bottom nav with raised collect button */
+nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--card);border-top:1px solid var(--line);display:flex;z-index:500}
+nav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:.72rem;font-weight:600;color:var(--muted);cursor:pointer;min-height:44px}
+nav svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--brand-2)}
+@media (prefers-color-scheme:dark){nav button.on{color:var(--accent)}}
+nav .collect{position:relative}
+nav .collect span.disc{width:60px;height:60px;margin-top:-30px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 4px 14px rgba(244,180,26,.5);border:4px solid var(--card)}
+nav .collect.on{color:var(--ink)}
+
+/* map */
+#map{height:100%}
+.map-card{position:absolute;left:12px;right:12px;bottom:12px;z-index:400;background:var(--card);border-radius:var(--r);box-shadow:0 6px 24px rgba(0,0,0,.18);display:flex;gap:12px;padding:10px;align-items:center;cursor:pointer;border:0;text-align:left;max-width:520px;margin:0 auto}
+.map-card img{width:64px;height:64px;border-radius:12px;flex:none}
+.map-card b{font-family:var(--hfont);font-size:1.05rem;display:block}
+.map-card small{color:var(--muted)}
+.pin{background:none;border:0}
+.pin div{width:34px;height:34px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:var(--brand-2);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);display:grid;place-items:center}
+.pin div i{transform:rotate(45deg);color:#fff;font:700 .78rem var(--hfont);font-style:normal}
+.pin.got div{background:var(--accent)}.pin.got div i{color:var(--accent-ink)}
+.pin.sel div{outline:3px solid var(--heather)}
+.me{width:18px;height:18px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 7px rgba(26,115,232,.25)}
+.fab{position:absolute;right:12px;top:12px;z-index:400;width:48px;height:48px;border-radius:14px;border:0;background:var(--card);box-shadow:var(--shadow);cursor:pointer;display:grid;place-items:center}
+.fab svg{width:24px;height:24px;stroke:var(--brand-2);fill:none;stroke-width:2}
+
+/* list */
+.search{display:flex;gap:8px;position:sticky;top:0;background:var(--bg);padding:12px 16px 8px;z-index:5}
+.search input{flex:1;min-height:46px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:0 14px;font:inherit}
+.chips{display:flex;gap:8px;padding:0 16px 8px;position:sticky;top:66px;background:var(--bg);z-index:5}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:8px 14px;font-weight:600;font-size:.85rem;cursor:pointer;min-height:40px}
+.chip.on{background:var(--brand-2);border-color:var(--brand-2);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;padding:4px 16px 20px}
+.tile{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);border:0;padding:0;text-align:left;cursor:pointer;position:relative}
+.pic{display:block;position:relative;background:#cfdcf0;aspect-ratio:1;overflow:hidden}
+/* photo softened (blur + darker) so the statue pops; statue gets a white rim and drop shadow */
+.pic::before,.hero::before{content:'';position:absolute;inset:-8px;background:var(--photo) center/cover no-repeat;filter:blur(1.2px) brightness(.75) saturate(.85)}
+.pic img{position:relative;width:100%;height:100%;object-fit:cover;display:block;filter:drop-shadow(0 0 1.5px rgba(255,255,255,.95)) drop-shadow(0 8px 10px rgba(0,0,0,.5))}
+#stage canvas{filter:drop-shadow(0 0 2px rgba(255,255,255,.9)) drop-shadow(0 14px 18px rgba(0,0,0,.5))}
+.hero{overflow:hidden}
+.pic.sm{width:64px;height:64px;border-radius:12px;flex:none}
+.pic.big{width:170px;height:170px;border-radius:22px;margin:0 auto;box-shadow:var(--shadow)}
+.tile .t{padding:10px 12px 12px}
+.tile b{font-family:var(--hfont);font-weight:600;font-size:1rem;display:block;line-height:1.2}
+.tile small{color:var(--muted);font-size:.78rem}
+.num,.tile .check{z-index:1}
+.num{position:absolute;top:8px;left:8px;background:var(--brand);color:#fff;font:700 .8rem var(--hfont);padding:3px 9px;border-radius:99px}
+.tile.got .num{background:var(--accent);color:var(--accent-ink)}
+.tile .check{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-weight:700}
+.tile:not(.got) .pic{filter:saturate(.45) brightness(1.05)}
+.empty{padding:40px 16px;text-align:center;color:var(--muted)}
+
+/* collect */
+.collect-v{display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px 16px}
+.collect-v p{color:var(--muted);max-width:340px;margin:8px 0 20px}
+.digits{display:flex;gap:10px;margin-bottom:22px}
+.digits span{width:58px;height:70px;border-radius:14px;background:var(--card);border:2px solid var(--line);display:grid;place-items:center;font:700 2rem var(--hfont)}
+.digits span.f{border-color:var(--brand-2)}
+.digits.bad{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pad{display:grid;grid-template-columns:repeat(3,78px);gap:12px}
+.pad button{height:64px;border-radius:16px;border:0;background:var(--card);box-shadow:var(--shadow);font:600 1.5rem var(--hfont);cursor:pointer}
+.pad button:active{transform:scale(.96)}
+.pad .del{font-size:1.1rem}
+.cmsg{min-height:1.5em;margin-top:14px;font-weight:600}
+
+/* progress */
+.ringcard{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border-radius:22px;padding:20px;display:flex;gap:18px;align-items:center;box-shadow:var(--shadow)}
+.ring{width:110px;height:110px;flex:none;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font:700 1.7rem var(--hfont)}
+.ringcard h2{font-size:1.35rem}.ringcard p{margin:4px 0 0;opacity:.85}
+.sec{margin:22px 0 10px;font-size:1.15rem}
+.stars{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px}
+.star{background:var(--card);border-radius:16px;padding:14px 8px;text-align:center;box-shadow:var(--shadow)}
+.star svg{width:40px;height:40px}
+.star b{display:block;font-family:var(--hfont);font-size:.95rem;margin-top:4px}
+.star small{color:var(--muted)}
+.star:not(.got){opacity:.5}.star:not(.got) svg path{fill:var(--line)}
+.info{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);margin-bottom:10px}
+.info h3{font-size:1.02rem;margin-bottom:4px}.info p{margin:0;color:var(--muted)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;margin:10px 0}
+.steps li::before{content:counter(s);flex:none;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:700 1rem var(--hfont);display:grid;place-items:center}
+.btn{border:0;border-radius:14px;padding:12px 18px;font-weight:600;cursor:pointer;background:var(--brand-2);color:#fff;min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn.y{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--brand-2);border:2px solid var(--line)}
+@media (prefers-color-scheme:dark){.btn.ghost{color:#cdd8ff}}
+.btn.wide{width:100%}
+
+/* detail sheet */
+#sheet{position:fixed;inset:0;z-index:1100;background:var(--bg);display:none;flex-direction:column;overflow:auto}
+#sheet.on{display:flex}
+.hero{position:relative;height:64vh;min-height:320px;flex:none;background:radial-gradient(circle at 50% 35%,#ffffff,#d9e2f5 70%)}
+@media (prefers-color-scheme:dark){.hero{background:radial-gradient(circle at 50% 35%,#2c3a63,#0d1222 75%)}}
+#stage{position:absolute;inset:0}
+.hbar{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:12px;padding-top:calc(12px + env(safe-area-inset-top));z-index:2;pointer-events:none}
+.hbar button{pointer-events:auto;height:44px;min-width:44px;border-radius:14px;border:0;background:rgba(255,255,255,.92);color:#14275a;font-weight:700;padding:0 14px;box-shadow:var(--shadow);cursor:pointer}
+.hbar .nav2{display:flex;gap:8px}
+.hint{position:absolute;bottom:26px;left:0;right:0;text-align:center;font-size:.75rem;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.8);pointer-events:none}
+.body{background:var(--bg);border-radius:20px 20px 0 0;margin-top:-18px;position:relative;padding:12px 16px 20px;flex:1}
+.body .in{max-width:520px;margin:0 auto}
+.body .info{padding:10px 12px;margin-bottom:8px;font-size:.88rem}
+.body .info h3{font-size:.92rem;margin-bottom:2px}
+.body .btn{min-height:42px;padding:8px 14px}
+.body .acts{margin:8px 0}
+.body .codebox input{min-height:42px;font-size:1.1rem}
+.body .cmsg{margin:4px 0 0;min-height:0}.body .cmsg:empty{display:none}
+.codebox input::placeholder{letter-spacing:0;font:500 .9rem Inter,sans-serif}
+.kicker{display:inline-block;background:var(--brand);color:#fff;font:700 .78rem var(--hfont);padding:4px 12px;border-radius:99px;letter-spacing:.4px}
+.kicker.got{background:var(--ok)}
+@media (prefers-color-scheme:dark){.kicker:not(.got),.num{background:var(--brand-2)}}
+.body h2{font-size:1.35rem;margin:4px 0 0}
+.by{color:var(--muted);margin:0 0 8px;font-size:.88rem}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.loc{display:flex;gap:12px;align-items:flex-start}
+.loc svg{flex:none;width:22px;height:22px;stroke:var(--heather);fill:none;stroke-width:2;margin-top:2px}
+.fav{border:0;background:none;cursor:pointer;font-size:1.6rem;line-height:1;padding:6px;min-width:44px;min-height:44px}
+.codebox{display:flex;gap:8px;margin-top:10px}
+.codebox input{flex:1;min-height:48px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:700 1.3rem var(--hfont);letter-spacing:8px;text-align:center}
+.credit{font-size:.72rem;color:var(--muted);margin-top:18px}.credit a{color:inherit}
+
+/* celebrate + splash */
+.overlay{position:fixed;inset:0;z-index:1250;background:rgba(10,18,40,.72);display:none;align-items:center;justify-content:center;padding:24px}
+.overlay.on{display:flex}
+.pop{background:var(--card);border-radius:26px;padding:26px 22px;text-align:center;max-width:340px;width:100%;animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.7);opacity:0}}
+.pop h2{font-size:1.5rem;margin:14px 0 4px}.pop p{color:var(--muted);margin:0 0 18px}
+#splash{position:fixed;inset:0;z-index:1300;background:linear-gradient(160deg,#14275a,#2a4aa8 60%,#8e5bb5);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;transition:opacity .4s}
+#splash.hide{opacity:0;pointer-events:none}
+#splash .logo{width:110px;height:110px}
+#splash h1{font-size:2.3rem;margin-top:14px}
+#splash p{opacity:.85;max-width:320px;margin:8px 0 28px}
+#splash .steps{text-align:left;max-width:320px;margin-bottom:28px}
+.leaflet-control-attribution{font-size:10px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <!-- own logo: Westie head in a gold roundel -->
+  <symbol id="logo" viewBox="0 0 64 64"><circle cx="32" cy="32" r="31" fill="#f4b41a"/><path d="M18 14l6 13M46 14l-6 13" stroke="#fff" stroke-width="7" stroke-linecap="round"/><ellipse cx="32" cy="35" rx="17" ry="15" fill="#fff"/><path d="M17 38q-3 6 3 10M47 38q3 6-3 10" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="25.5" cy="33" r="2.6" fill="#14275a"/><circle cx="38.5" cy="33" r="2.6" fill="#14275a"/><ellipse cx="32" cy="40.5" rx="4" ry="3" fill="#14275a"/><path d="M28 46q4 3 8 0" stroke="#14275a" stroke-width="1.8" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z" fill="#f4b41a"/></symbol>
+</svg>
+
+<div id="splash" role="dialog" aria-modal="true" aria-label="Welcome">
+  <svg class="logo"><use href="#logo"/></svg>
+  <h1>Westies of Ayr</h1>
+  <p>A free public art trail of painted West Highland Terriers across Ayr and Alloway.</p>
+  <ol class="steps">
+    <li>Use the map to find each Westie.</li>
+    <li>Type the 4-digit code from its plaque to collect it.</li>
+    <li>Earn stars as your collection grows.</li>
+  </ol>
+  <button class="btn y" id="go" style="min-width:220px">Start exploring</button>
+</div>
+
+<header>
+  <svg class="logo"><use href="#logo"/></svg>
+  <h1>Westies of Ayr<small>Art trail</small></h1>
+  <span class="pill" id="prog"></span>
+</header>
+
+<main>
+  <section class="view on" id="v-map">
+    <div id="map"></div>
+    <button class="fab" id="locate" aria-label="Show my location"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+    <button class="map-card" id="mapcard" hidden></button>
+  </section>
+  <section class="view" id="v-list">
+    <div class="search"><label class="sr" for="q">Search Westies</label><input id="q" type="search" placeholder="Search by name, artist or place"></div>
+    <div class="chips" role="group" aria-label="Filter">
+      <button class="chip on" data-f="all">All</button><button class="chip" data-f="no">To find</button><button class="chip" data-f="yes">Collected</button><button class="chip" data-f="fav">Favourites</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+  <section class="view" id="v-collect">
+    <div class="collect-v">
+      <h2>Collect a Westie</h2>
+      <p>Each Westie has a plaque with a 4-digit code. Enter it below to add the statue to your collection.</p>
+      <div class="digits" id="digits" aria-live="polite"><span></span><span></span><span></span><span></span></div>
+      <div class="pad" id="pad"></div>
+      <div class="cmsg" id="cmsg" role="status"></div>
+    </div>
+  </section>
+  <section class="view" id="v-me"><div class="wrap" id="me"></div></section>
+  <section class="view" id="v-game"><div id="game" style="height:100%;position:relative"></div></section>
+</main>
+
+<nav aria-label="Main">
+  <button class="on" data-v="map"><svg viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Map</button>
+  <button data-v="list"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Westies</button>
+  <button data-v="collect" class="collect"><span class="disc"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg></span>Collect</button>
+  <button data-v="me"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z"/></svg>Progress</button>
+  <button data-v="game"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11.5" r="1"/><circle cx="18" cy="13.5" r="1"/></svg>Game</button>
+</nav>
+
+<div id="sheet" role="dialog" aria-modal="true" aria-labelledby="s-title">
+  <div class="hero">
+    <div id="stage"></div>
+    <div class="hbar"><button id="s-close">← Back</button><div class="nav2"><button id="s-prev" aria-label="Previous Westie">‹</button><button id="s-next" aria-label="Next Westie">›</button></div></div>
+    <div class="hint">Drag to turn · pinch to zoom</div>
+  </div>
+  <div class="body"><div class="in" id="info"></div></div>
+</div>
+
+<div class="overlay" id="yay" role="dialog" aria-modal="true" aria-labelledby="yay-t"><div class="pop" id="yaybox"></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="locations.js"></script>
+<script src="model/westie-model.js"></script>
+<script src="photos/photos.js"></script>
+<script src="statue.js"></script>
+<script src="game.js"></script>
+<script>
+// Statue 2, Ayr Central: shopping design, slotted in after statue 1 (designs are matched to stops by position)
+WestieStatue.designs.splice(1, 0, {
+  name: 'Shop Till You Drop', artist: 'Kirsty Lennox',
+  blurb: 'Bags, bargains and a wee receipt that never ends, for the Westie who loves a day out at Ayr Central.',
+  paint(c, w, h) {
+    const s = w / 512, bags = ['#e8457a', '#f2b632', '#2bb3a3', '#7a5cff', '#ff7a3d', '#1f3b73'];
+    c.save(); c.scale(s, h / 512);
+    c.fillStyle = '#fde7ef'; c.fillRect(0, 0, 512, 512);
+    c.fillStyle = '#f9cfe0'; for (let y = 0; y < 512; y += 32) for (let x = (y / 32 % 2) * 32; x < 512; x += 64) c.fillRect(x, y, 32, 32);
+    for (let i = 0; i < 12; i++) { // shopping bags with handles
+      const x = (i % 4) * 128 + 22 + (i >> 2) % 2 * 40, y = (i >> 2) * 170 + 40, col = bags[i % bags.length];
+      c.fillStyle = col; c.fillRect(x, y + 22, 74, 84);
+      c.strokeStyle = col; c.lineWidth = 6; c.beginPath(); c.arc(x + 37, y + 22, 20, Math.PI, 0); c.stroke();
+      c.fillStyle = '#fff'; c.font = 'bold 18px Impact, sans-serif'; c.textAlign = 'center'; c.fillText(i % 3 ? '♥' : 'SALE', x + 37, y + 72);
+    }
+    c.save(); c.translate(400, 120); c.rotate(-0.3); // price tag
+    c.fillStyle = '#fff'; c.fillRect(-40, -22, 92, 44); c.fillStyle = '#e8457a'; c.font = 'bold 20px Georgia, serif'; c.textAlign = 'center'; c.fillText('50% OFF', 6, 7); c.restore();
+    c.fillStyle = '#1b2440'; for (let x = 20, i = 0; x < 160; x += (i++ % 3) + 3) c.fillRect(x, 470, (i % 2) + 2, 30); // barcode
+    c.restore();
+  }
+});
+WestieStatue.designs.forEach((d, i) => d.id = i);
+const LOCS = window.LOCATIONS, D = WestieStatue.designs, N = LOCS.length;
+// 4-digit code on each plaque, by stop. shortcut: codes live in page source, move server-side if prizes are at stake.
+const CODES = ['4821','1739','6054','2917','8362','5408','3176','9625','7043','1588','6297','4130','8814','2569','7351','3942','5786','9013','1264','6679','3508','8247','4695','2031','7920','5317','9468','1852','6143','3790','8576'];
+const NEAR_M = 40;
+const $ = id => document.getElementById(id);
+const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
+const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+let found = load('westie-found2', {}), favs = load('westie-favs', {});
+const count = () => Object.keys(found).length;
+const thumbs = D.map(d => WestieStatue.thumb(d.id, 300));
+// Statue pictures: each design rendered on its plinth (transparent PNG) over the stop's street photo.
+// Pattern swatch shows until the render is ready; renders run one at a time in the background.
+const shots = [];
+const photo = i => { const p = (window.PHOTO_CREDITS || []).find(p => p.n === i + 1); return p ? `photos/${p.file.split('/').pop()}` : ''; };
+const pic = (i, cls = '') => `<span class="pic ${cls}" style="--photo:${photo(i) ? `url('${photo(i)}')` : 'none'}"><img data-pic="${i}" src="${shots[i] || thumbs[i]}" alt="Statue No. ${i + 1}"></span>`;
+function renderShots() {
+  const box = document.createElement('div');
+  box.style.cssText = 'position:fixed;left:-2000px;top:0;width:360px;height:360px';
+  document.body.appendChild(box);
+  const v = WestieStatue.mount(box, 0);
+  let i = 0;
+  (function next() {
+    if (i >= N) { v.dispose(); box.remove(); return; }
+    try { shots[i] = v.snap(i); } catch (e) { console.warn('statue snapshot failed', i, e); }
+    document.querySelectorAll(`img[data-pic="${i}"]`).forEach(img => img.src = shots[i] || thumbs[i]);
+    i++; setTimeout(next, 30);
+  })();
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// splash: shown on first visit only
+if (load('westie-seen', false)) $('splash').remove();
+else $('go').onclick = () => { store('westie-seen', true); $('splash').classList.add('hide'); setTimeout(() => $('splash').remove(), 450); };
+
+// ---------- tabs + back button history ----------
+let tab = 'map', game = null;
+function show(v) {
+  tab = v;
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x.dataset.v === v));
+  document.querySelectorAll('.view').forEach(el => el.classList.toggle('on', el.id === 'v-' + v));
+  if (v === 'map') map.invalidateSize();
+  // game starts on first visit, pauses when another tab is shown
+  if (v === 'game' && window.WestieGame) game ? game.resume() : (game = WestieGame.mount($('game')));
+  else if (game) game.pause();
+}
+history.replaceState({ v: 'map' }, '');
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  if (b.dataset.v === tab) return;
+  history.pushState({ v: b.dataset.v }, '');
+  show(b.dataset.v);
+});
+addEventListener('popstate', e => {
+  const s = e.state || { v: 'map' };
+  sheet.classList.toggle('on', s.s != null);
+  if (s.s != null) open(s.s, true);
+  show(s.v);
+});
+
+// ---------- map ----------
+const map = L.map('map', { zoomControl: false }).setView([55.455, -4.63], 13);
+// OSM tiles block file:// pages (no referer) and CARTO now needs a key, so use Esri's keyless street map
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles © Esri' }).addTo(map);
+L.polyline(LOCS.map(l => [l.lat, l.lng]), { color: '#8e5bb5', weight: 4, opacity: .55, dashArray: '2 9', lineCap: 'round' }).addTo(map);
+let sel = null;
+const markers = LOCS.map((l, i) => L.marker([l.lat, l.lng], { title: D[i].name, keyboard: true }).on('click', () => pick(i)).addTo(map));
+map.fitBounds(L.latLngBounds(LOCS.map(l => [l.lat, l.lng])), { padding: [30, 30] });
+map.on('click', () => { sel = null; $('mapcard').hidden = true; pins(); });
+function pick(i) {
+  sel = i; pins();
+  const c = $('mapcard'); c.hidden = false;
+  c.innerHTML = `${pic(i, 'sm')}<span><small>No. ${i + 1}${found[i] ? ' · Collected ✓' : ''}</small><b>${esc(D[i].name)}</b><small>${esc(LOCS[i].place)}</small></span>`;
+  c.onclick = () => open(i);
+}
+function pins() {
+  markers.forEach((m, i) => m.setIcon(L.divIcon({ className: 'pin' + (found[i] ? ' got' : '') + (sel === i ? ' sel' : ''), html: `<div><i>${found[i] ? '✓' : i + 1}</i></div>`, iconSize: [34, 34], iconAnchor: [17, 34] })));
+}
+
+// location is only asked for on a tap (file:// pages can't remember the permission)
+let me = null, meMarker = null, watching = false;
+function locate(then, fail) {
+  if (!navigator.geolocation) return fail('This browser cannot share your location. Use the plaque code.');
+  navigator.geolocation.getCurrentPosition(p => {
+    me = [p.coords.latitude, p.coords.longitude];
+    if (!meMarker) meMarker = L.marker(me, { icon: L.divIcon({ className: '', html: '<div class="me"></div>', iconSize: [18, 18] }) }).addTo(map);
+    else meMarker.setLatLng(me);
+    if (!watching) { watching = true; navigator.geolocation.watchPosition(q => { me = [q.coords.latitude, q.coords.longitude]; meMarker.setLatLng(me); }, () => {}, { enableHighAccuracy: true }); }
+    then();
+  }, () => fail('Location is blocked. Use the plaque code instead.'), { enableHighAccuracy: true, timeout: 15000 });
+}
+$('locate').onclick = () => locate(() => map.setView(me, 16), t => alertLine(t));
+function alertLine(t) { const c = $('mapcard'); c.hidden = false; c.innerHTML = `<span><b>Location</b><small>${esc(t)}</small></span>`; c.onclick = null; }
+
+// ---------- list ----------
+let filter = 'all';
+document.querySelectorAll('.chip').forEach(c => c.onclick = () => { filter = c.dataset.f; document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c)); grid(); });
+$('q').oninput = grid;
+function grid() {
+  const q = $('q').value.trim().toLowerCase();
+  const items = LOCS.map((l, i) => i).filter(i =>
+    (filter === 'all' || (filter === 'yes') === !!found[i] && filter !== 'fav' || filter === 'fav' && favs[i]) &&
+    (!q || (D[i].name + ' ' + D[i].artist + ' ' + LOCS[i].place).toLowerCase().includes(q)));
+  $('grid').innerHTML = items.length ? items.map(i => `<button class="tile${found[i] ? ' got' : ''}" data-i="${i}">
+      <span class="num">No. ${i + 1}</span>${found[i] ? '<span class="check" aria-label="Collected">✓</span>' : ''}
+      ${pic(i)}<div class="t"><b>${esc(D[i].name)}</b><small>${esc(LOCS[i].place)}</small></div></button>`).join('')
+    : '<p class="empty" style="grid-column:1/-1">No Westies match.</p>';
+  document.querySelectorAll('.tile').forEach(el => el.onclick = () => open(+el.dataset.i));
+}
+
+// ---------- collect (keypad) ----------
+let entry = '';
+$('pad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '⌫'].map(k => k === '' ? '<span></span>' : `<button data-k="${k}" class="${k === '⌫' ? 'del' : ''}" aria-label="${k === '⌫' ? 'Delete' : k}">${k}</button>`).join('');
+$('pad').onclick = e => {
+  const k = e.target.closest('button'); if (!k) return;
+  entry = k.dataset.k === '⌫' ? entry.slice(0, -1) : (entry + k.dataset.k).slice(0, 4);
+  digits();
+  if (entry.length === 4) setTimeout(submit, 150);
+};
+addEventListener('keydown', e => { if (tab === 'collect' && !sheet.classList.contains('on') && /^[0-9]$|^Backspace$/.test(e.key)) $('pad').querySelector(`[data-k="${e.key === 'Backspace' ? '⌫' : e.key}"]`).click(); });
+function digits() { [...$('digits').children].forEach((s, i) => { s.textContent = entry[i] || ''; s.classList.toggle('f', i < entry.length); }); }
+function submit() {
+  const i = CODES.indexOf(entry);
+  const m = $('cmsg');
+  if (i < 0) { m.textContent = 'That code isn\'t right. Check the plaque and try again.'; $('digits').classList.add('bad'); setTimeout(() => $('digits').classList.remove('bad'), 400); }
+  else if (found[i]) m.textContent = `You already collected No. ${i + 1}, ${D[i].name}.`;
+  else { m.textContent = ''; collect(i); }
+  entry = ''; digits();
+}
+
+// ---------- progress ----------
+const TIERS = [[1, 'First paw'], [5, 'Good dog'], [10, 'Bonnie walker'], [15, 'Halfway hero'], [20, 'Top dog'], [25, 'Pack leader'], [N, 'Westie legend']];
+function progress() {
+  const c = count(), C = 2 * Math.PI * 48;
+  $('me').innerHTML = `
+    <div class="ringcard"><div class="ring"><svg width="110" height="110"><circle cx="55" cy="55" r="48" stroke="rgba(255,255,255,.2)" stroke-width="10" fill="none"/>
+      <circle cx="55" cy="55" r="48" stroke="#f4b41a" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - c / N)}"/></svg><b>${c}</b></div>
+      <div><h2>${c === N ? 'Trail complete!' : c ? 'Keep going!' : 'Ready to explore?'}</h2><p>${c} of ${N} Westies collected</p></div></div>
+    <h3 class="sec">Stars</h3>
+    <div class="stars">${TIERS.map(([n, t]) => `<div class="star${c >= n ? ' got' : ''}"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z" fill="#f4b41a"/></svg><b>${t}</b><small>${n} Westies</small></div>`).join('')}</div>
+    <h3 class="sec">How it works</h3>
+    <div class="info"><ol class="steps"><li>Find a Westie using the map.</li><li>Look for the plaque on its plinth and note the 4-digit code.</li><li>Tap Collect and enter the code, or tap "I'm here" on the Westie's page.</li></ol></div>
+    <h3 class="sec">About the trail</h3>
+    <div class="info"><p>${N} painted West Highland Terrier statues across Ayr and Alloway, each decorated by a different artist. Follow the dotted line on the map from Ayr Station to the Brig o' Doon.</p></div>
+    <div class="info"><h3>Credits</h3><p>${WestieStatue.credit ? '3D model: ' + esc(WestieStatue.credit.replace(/\.$/, '')) + '. ' : ''}Street photos from Wikimedia Commons; each is credited on its Westie's page. Map tiles © Esri.</p></div>
+    <h3 class="sec">Reset progress</h3>
+    <div class="info" style="display:grid;gap:8px">
+      <button class="btn ghost wide" data-reset="trail">Reset trail collection</button>
+      <button class="btn ghost wide" data-reset="game">Reset game best times and stars</button>
+      <button class="btn ghost wide" data-reset="all" style="color:#d64545">Reset everything</button>
+      <p style="font-size:.8rem">Everything also clears favourites and shows the welcome screen again. This can't be undone.</p>
+    </div>`;
+  document.querySelectorAll('[data-reset]').forEach(b => b.onclick = () => resetProgress(b.dataset.reset));
+}
+function resetProgress(what) {
+  const ask = { trail: 'Clear all collected Westies?', game: 'Clear all game best times and stars?', all: 'Clear ALL progress, game scores and favourites?' }[what];
+  if (!confirm(ask)) return;
+  if (what !== 'game') { found = {}; store('westie-found2', found); }
+  try { // game saves every level's best time under keys starting westie-game-best
+    if (what !== 'trail') Object.keys(localStorage).filter(k => k.startsWith('westie-game-best')).forEach(k => localStorage.removeItem(k));
+    if (what === 'all') { favs = {}; ['westie-favs', 'westie-seen'].forEach(k => localStorage.removeItem(k)); }
+  } catch (e) {}
+  // game reads best times when it builds its menu, so rebuild it next time the Game tab opens
+  if (what !== 'trail' && game) { game.dispose(); game = null; $('game').innerHTML = ''; }
+  render();
+}
+
+// ---------- detail sheet ----------
+let cur = 0, viewer = null;
+const sheet = $('sheet');
+function open(i, fromHistory) {
+  cur = (i + N) % N;
+  if (!fromHistory) (sheet.classList.contains('on') ? history.replaceState : history.pushState).call(history, { v: tab, s: cur }, '');
+  const l = LOCS[cur], d = D[cur];
+  sheet.classList.add('on'); sheet.scrollTop = 0;
+  // real street photo of this stop behind the 3D statue (photos/NN.jpg); gradient if none
+  const ph = (window.PHOTO_CREDITS || []).find(p => p.n === cur + 1);
+  document.querySelector('.hero').style.setProperty('--photo', ph ? `url("photos/${ph.file.split('/').pop()}")` : 'none');
+  if (!viewer) viewer = WestieStatue.mount($('stage'), cur); else viewer.setDesign(cur);
+  $('info').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span class="kicker${found[cur] ? ' got' : ''}">No. ${cur + 1}${found[cur] ? ' · Collected' : ''}</span>
+      <button class="fav" id="fav" aria-pressed="${!!favs[cur]}" aria-label="Favourite">${favs[cur] ? '❤️' : '🤍'}</button></div>
+    <h2 id="s-title">${esc(d.name)}</h2>
+    <p class="by">by ${esc(d.artist)}</p>
+    <div class="info"><p>${esc(d.blurb)}</p>
+      <div class="loc" style="margin-top:8px"><svg viewBox="0 0 24 24"><path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      <div><h3>${esc(l.place)}</h3><p>${esc(l.desc)}</p></div></div></div>
+    <div class="acts">
+      <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&travelmode=walking&destination=${l.lat},${l.lng}" target="_blank" rel="noopener">Directions</a>
+      ${found[cur] ? `<span class="btn" style="background:var(--ok)">✓ ${new Date(found[cur]).toLocaleDateString('en-GB')}</span>` : '<button class="btn y" id="gps">I\'m here</button>'}
+    </div>
+    ${found[cur] ? '' : `<div class="info">
+      <div class="codebox" style="margin-top:0"><label class="sr" for="code">4-digit plaque code</label><input id="code" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="Plaque code"><button class="btn" id="chk">Collect</button></div>
+      <p class="cmsg" id="msg" role="status"></p></div>`}
+    <p class="credit">${ph ? `Photo: <a href="${esc(ph.source_url)}" target="_blank" rel="noopener">${esc(ph.title)}</a> by ${esc(ph.author)}, <a href="${esc(ph.licence_url)}" target="_blank" rel="noopener">${esc(ph.licence)}</a>.<br>` : ''}${WestieStatue.credit ? '3D model: ' + esc(WestieStatue.credit) : ''}</p>`;
+  $('fav').onclick = () => { favs[cur] ? delete favs[cur] : favs[cur] = 1; store('westie-favs', favs); open(cur, true); grid(); };
+  if (found[cur]) return;
+  const msg = t => $('msg').textContent = t;
+  $('gps').onclick = () => {
+    msg('Finding you…');
+    locate(() => {
+      const m = Math.round(map.distance(me, [l.lat, l.lng]));
+      m <= NEAR_M ? collect(cur) : msg(`You're ${m} m away. Get within ${NEAR_M} m or use the plaque code.`);
+    }, msg);
+  };
+  $('chk').onclick = () => $('code').value.trim() === CODES[cur] ? collect(cur) : msg('That code doesn\'t match this Westie.');
+}
+const close = () => history.state && history.state.s != null ? history.back() : sheet.classList.remove('on');
+$('s-close').onclick = close;
+$('s-prev').onclick = () => open(cur - 1);
+$('s-next').onclick = () => open(cur + 1);
+
+function collect(i) {
+  found[i] = Date.now(); store('westie-found2', found); render();
+  if (sheet.classList.contains('on') && cur === i) open(i, true);
+  const c = count(), star = TIERS.find(([n]) => n === c);
+  $('yaybox').innerHTML = `${pic(i, 'big')}<h2 id="yay-t">You found No. ${i + 1}!</h2>
+    <p><b>${esc(D[i].name)}</b> by ${esc(D[i].artist)}<br>${c} of ${N} collected${star ? `<br>⭐ New star: <b>${star[1]}</b>` : ''}</p>
+    <button class="btn y wide" id="yayok">Brilliant!</button>`;
+  $('yay').classList.add('on'); $('yayok').focus();
+  $('yayok').onclick = () => $('yay').classList.remove('on');
+}
+addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if ($('yay').classList.contains('on')) $('yay').classList.remove('on');
+  else if (sheet.classList.contains('on')) close();
+});
+
+function render() { $('prog').textContent = count() + ' / ' + N; pins(); grid(); progress(); if (sel != null) pick(sel); }
+
+console.assert(D.length === N && CODES.length === N && new Set(CODES).size === N && CODES.every(c => /^\d{4}$/.test(c)), 'trail data mismatch');
+render();
+setTimeout(renderShots, 300);
+// index.html#s5 opens statue 5 (for QR codes on plinths)
+const h = location.hash.match(/^#s(\d+)$/); if (h) { $('splash') && $('splash').remove(); open(+h[1] - 1); }
+</script>
+</body>
+</html>

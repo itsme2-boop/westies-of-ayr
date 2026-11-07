@@ -1,0 +1,281 @@
+window.PHOTO_CREDITS = [
+  {
+    "n": 1,
+    "file": "photos/01.jpg",
+    "title": "Railway Station - Ayr - geograph.org.uk - 5944518",
+    "author": "Ian Rainey",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Railway_Station_-_Ayr_-_geograph.org.uk_-_5944518.jpg"
+  },
+  {
+    "n": 2,
+    "file": "photos/02.jpg",
+    "title": "Ayr Central Shopping Centre - geograph.org.uk - 6100590",
+    "author": "Ian Rainey",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Ayr_Central_Shopping_Centre_-_geograph.org.uk_-_6100590.jpg"
+  },
+  {
+    "n": 3,
+    "file": "photos/03.jpg",
+    "title": "Burns Statue Square, Ayr - geograph.org.uk - 5754762",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Burns_Statue_Square,_Ayr_-_geograph.org.uk_-_5754762.jpg"
+  },
+  {
+    "n": 4,
+    "file": "photos/04.jpg",
+    "title": "Tam O' Shanter Inn, Ayr - geograph.org.uk - 5538550",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Tam_O%27_Shanter_Inn,_Ayr_-_geograph.org.uk_-_5538550.jpg"
+  },
+  {
+    "n": 5,
+    "file": "photos/05.jpg",
+    "title": "High Street, Ayr - geograph.org.uk - 5538563",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:High_Street,_Ayr_-_geograph.org.uk_-_5538563.jpg"
+  },
+  {
+    "n": 6,
+    "file": "photos/06.jpg",
+    "title": "The Auld Kirk, Ayr - geograph.org.uk - 4105948",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:The_Auld_Kirk,_Ayr_-_geograph.org.uk_-_4105948.jpg"
+  },
+  {
+    "n": 7,
+    "file": "photos/07.jpg",
+    "title": "Turner's Bridge - Ayr - geograph.org.uk - 6030317",
+    "author": "Ian Rainey",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Turner%27s_Bridge_-_Ayr_-_geograph.org.uk_-_6030317.jpg"
+  },
+  {
+    "n": 8,
+    "file": "photos/08.jpg",
+    "title": "Craigie House, Ayr - geograph.org.uk - 5629240",
+    "author": "Humphrey Bolton",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Craigie_House,_Ayr_-_geograph.org.uk_-_5629240.jpg"
+  },
+  {
+    "n": 9,
+    "file": "photos/09.jpg",
+    "title": "Ayr Racecourse - geograph.org.uk - 4690924",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Ayr_Racecourse_-_geograph.org.uk_-_4690924.jpg"
+  },
+  {
+    "n": 10,
+    "file": "photos/10.jpg",
+    "title": "Ayr Carnegie Library (2251285728)",
+    "author": "JuliaC2006 from Rochester, UK",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Ayr_Carnegie_Library_(2251285728).jpg"
+  },
+  {
+    "n": 11,
+    "file": "photos/11.jpg",
+    "title": "The Auld Brig, Ayr - geograph.org.uk - 4106100",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:The_Auld_Brig,_Ayr_-_geograph.org.uk_-_4106100.jpg"
+  },
+  {
+    "n": 12,
+    "file": "photos/12.jpg",
+    "title": "Ayr Town Hall, South Ayrshire. View from the West",
+    "author": "Rosser1954",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Ayr_Town_Hall,_South_Ayrshire._View_from_the_West.jpg"
+  },
+  {
+    "n": 13,
+    "file": "photos/13.jpg",
+    "title": "Loudoun Hall, Ayr - geograph.org.uk - 5193418",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Loudoun_Hall,_Ayr_-_geograph.org.uk_-_5193418.jpg"
+  },
+  {
+    "n": 14,
+    "file": "photos/14.jpg",
+    "title": "River Ayr - geograph.org.uk - 2794005",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:River_Ayr_-_geograph.org.uk_-_2794005.jpg"
+  },
+  {
+    "n": 15,
+    "file": "photos/15.jpg",
+    "title": "Citadel Leisure Centre, Ayr, South Ayrshire - geograph.org.uk - 6413410",
+    "author": "Mark S",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Citadel_Leisure_Centre,_Ayr,_South_Ayrshire_-_geograph.org.uk_-_6413410.jpg"
+  },
+  {
+    "n": 16,
+    "file": "photos/16.jpg",
+    "title": "Citadel Place, Ayr, South Ayrshire - geograph.org.uk - 6210294",
+    "author": "Mark S",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Citadel_Place,_Ayr,_South_Ayrshire_-_geograph.org.uk_-_6210294.jpg"
+  },
+  {
+    "n": 17,
+    "file": "photos/17.jpg",
+    "title": "St. John's Tower, Ayr - geograph.org.uk - 5378301",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:St._John%27s_Tower,_Ayr_-_geograph.org.uk_-_5378301.jpg"
+  },
+  {
+    "n": 18,
+    "file": "photos/18.jpg",
+    "title": "Ayr Beach - geograph.org.uk - 5205239",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Ayr_Beach_-_geograph.org.uk_-_5205239.jpg"
+  },
+  {
+    "n": 19,
+    "file": "photos/19.jpg",
+    "title": "Ayr Pavilion - geograph.org.uk - 6351370",
+    "author": "Peter McDermott",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Ayr_Pavilion_-_geograph.org.uk_-_6351370.jpg"
+  },
+  {
+    "n": 20,
+    "file": "photos/20.jpg",
+    "title": "Low Green, Ayr - geograph.org.uk - 5205102",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Low_Green,_Ayr_-_geograph.org.uk_-_5205102.jpg"
+  },
+  {
+    "n": 21,
+    "file": "photos/21.jpg",
+    "title": "Wellington Square Ayr Scotland - geograph.org.uk - 4715020",
+    "author": "david cameron photographer",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Wellington_Square_Ayr_Scotland_-_geograph.org.uk_-_4715020.jpg"
+  },
+  {
+    "n": 22,
+    "file": "photos/22.jpg",
+    "title": "Sandgate in Ayr - geograph.org.uk - 6442699",
+    "author": "Steve Daniels",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Sandgate_in_Ayr_-_geograph.org.uk_-_6442699.jpg"
+  },
+  {
+    "n": 23,
+    "file": "photos/23.jpg",
+    "title": "Boswell Park, Ayr - geograph.org.uk - 5378141",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Boswell_Park,_Ayr_-_geograph.org.uk_-_5378141.jpg"
+  },
+  {
+    "n": 24,
+    "file": "photos/24.jpg",
+    "title": "Holy Trinity Episcopal Church, Ayr (geograph 4910347)",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Holy_Trinity_Episcopal_Church,_Ayr_(geograph_4910347).jpg"
+  },
+  {
+    "n": 25,
+    "file": "photos/25.jpg",
+    "title": "The Gaiety, Ayr - geograph.org.uk - 7754331",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:The_Gaiety,_Ayr_-_geograph.org.uk_-_7754331.jpg"
+  },
+  {
+    "n": 26,
+    "file": "photos/26.jpg",
+    "title": "Belleisle Park - geograph.org.uk - 5688055",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Belleisle_Park_-_geograph.org.uk_-_5688055.jpg"
+  },
+  {
+    "n": 27,
+    "file": "photos/27.jpg",
+    "title": "Rozelle House - geograph.org.uk - 5672804",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Rozelle_House_-_geograph.org.uk_-_5672804.jpg"
+  },
+  {
+    "n": 28,
+    "file": "photos/28.jpg",
+    "title": "Burns Cottage, Alloway 2017-05-17 - 1",
+    "author": "August Schwerdfeger",
+    "licence": "CC BY 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Burns_Cottage,_Alloway_2017-05-17_-_1.jpg"
+  },
+  {
+    "n": 29,
+    "file": "photos/29.jpg",
+    "title": "Alloway Auld Kirk - geograph.org.uk - 4094801",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Alloway_Auld_Kirk_-_geograph.org.uk_-_4094801.jpg"
+  },
+  {
+    "n": 30,
+    "file": "photos/30.jpg",
+    "title": "Burns Monument, Alloway - geograph.org.uk - 5376120",
+    "author": "Billy McCrorie",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Burns_Monument,_Alloway_-_geograph.org.uk_-_5376120.jpg"
+  },
+  {
+    "n": 31,
+    "file": "photos/31.jpg",
+    "title": "Brig O' Doon By VegasGav77774",
+    "author": "VegasGav7777",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Brig_O%27_Doon_By_VegasGav77774.jpg"
+  }
+];
