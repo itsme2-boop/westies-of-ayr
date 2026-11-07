@@ -1872,10 +1872,11 @@
       if (!kind) { screenEl.classList.remove('wg-on'); return; }
       var b = best(L.key), n = L.statues.length, menu = '<button class="wg-go wg-alt" data-act="menu">Choose level</button>';
       var html;
+      var LEAVE = document.getElementById('game-exit') ? '<button class="wg-go wg-alt" data-act="leave">← Back to the trail</button>' : '';
       if (kind === 'start') {
         html = '<p class="wg-kicker">Westies of Ayr</p><h2>Westie Hunt</h2><p>Find every painted Westie as fast as you can. Follow the gold arrow.</p>' +
           '<div class="wg-levels">' + LEVELS.map(function (l) { return levelCard(l.key, l.title, typeof l.sub === 'function' ? l.sub() : l.sub); }).join('') + '</div>' +
-          '<p style="font-size:.85rem;margin-top:12px">Move with WASD / arrow keys, or the joystick on a phone.</p>' + soundBtns();
+          '<p style="font-size:.85rem;margin-top:12px">Move with WASD / arrow keys, or the joystick on a phone.</p>' + soundBtns() + LEAVE;
         music.play('menu');
       } else if (kind === 'pause') {
         var grid = '';
@@ -1883,7 +1884,7 @@
           var got = {}; L.statues.forEach(function (s) { if (s.found) got[s.id] = 1; });
           grid = '<div class="wg-grid" aria-label="Trail numbers found">' + D.map(function (d, i) { return '<span' + (got[i] ? ' class="wg-got" title="' + d.name.replace(/"/g, '') + '"' : '') + '>' + (i + 1) + '</span>'; }).join('') + '</div>';
         }
-        html = '<p class="wg-kicker">' + L.title + '</p><h2>Paused</h2><p>' + found + ' of ' + n + ' found in ' + fmt(time) + (L.floors ? ' · Floor ' + (L.floor + 1) + '/' + L.floors.length : '') + '</p>' + grid + '<button class="wg-go" data-act="resume">Resume</button><button class="wg-go wg-alt" data-act="restart">Restart</button>' + soundBtns() + menu;
+        html = '<p class="wg-kicker">' + L.title + '</p><h2>Paused</h2><p>' + found + ' of ' + n + ' found in ' + fmt(time) + (L.floors ? ' · Floor ' + (L.floor + 1) + '/' + L.floors.length : '') + '</p>' + grid + '<button class="wg-go" data-act="resume">Resume</button><button class="wg-go wg-alt" data-act="restart">Restart</button>' + soundBtns() + menu + LEAVE;
       } else if (kind === 'win') {
         var st = starsFor(L.key, Math.floor(time)), stars = '', i;
         for (i = 0; i < 3; i++) stars += '<span' + (i < st ? ' class="wg-got"' : '') + ' style="animation-delay:' + (0.15 + i * 0.18) + 's">★</span>';
@@ -1891,9 +1892,9 @@
         html = '<p class="wg-kicker">Level complete</p><h2>' + (L.exit ? 'Out of the maze!' : 'All Westies found!') + '</h2><div class="wg-bigstars" aria-label="' + st + ' of 3 stars">' + stars + '</div>' +
           '<div class="wg-stats"><div><small>Time</small><b>' + fmt(time) + '</b></div><div><small>' + (newBest && prevBest !== null ? 'New best!' : 'Best') + '</small><b>' + (b !== null ? fmt(b) : '–') + '</b></div></div>' +
           (nx ? '<button class="wg-go" data-act="' + nx[0] + '">Next level: ' + nx[1] + '</button><button class="wg-go wg-alt" data-act="restart">Play again</button>'
-            : '<button class="wg-go" data-act="restart">Play again</button>' + menu);
+            : '<button class="wg-go" data-act="restart">Play again</button>' + menu) + LEAVE;
       } else {
-        html = '<p class="wg-kicker">' + L.title + '</p><h2>Out of hearts!</h2><p>You found ' + found + ' of ' + n + ' Westies.</p><button class="wg-go" data-act="restart">Try again</button>' + menu;
+        html = '<p class="wg-kicker">' + L.title + '</p><h2>Out of hearts!</h2><p>You found ' + found + ' of ' + n + ' Westies.</p><button class="wg-go" data-act="restart">Try again</button>' + menu + LEAVE;
       }
       card.innerHTML = html; screenEl.classList.add('wg-on');
       [].forEach.call(card.querySelectorAll('[data-act]'), function (btn) {
@@ -1903,6 +1904,7 @@
           else if (act === 'sfx') toggleSfx();
           else if (act === 'resume') resume();
           else if (act === 'menu') { state = 'start'; showScreen('start'); }
+          else if (act === 'leave') { var ex = document.getElementById('game-exit'); if (ex) ex.click(); } // host app's exit: pauses and goes to the map
           else begin(act === 'restart' ? L.key : act);
         };
       });

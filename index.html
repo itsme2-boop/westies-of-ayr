@@ -80,6 +80,8 @@ nav .collect.on{color:var(--ink)}
 .pic img{position:relative;width:100%;height:100%;object-fit:cover;display:block;filter:drop-shadow(0 0 1.5px rgba(255,255,255,.95)) drop-shadow(0 8px 10px rgba(0,0,0,.5))}
 #stage canvas{filter:drop-shadow(0 0 2px rgba(255,255,255,.9)) drop-shadow(0 14px 18px rgba(0,0,0,.5))}
 .hero{overflow:hidden}
+.pic .code{position:absolute;left:6px;bottom:6px;background:#1b2440;color:#f6dc8a;font:800 .8rem/1 Inter,sans-serif;letter-spacing:1px;padding:4px 6px;border-radius:7px}
+.pic.sm .code{left:3px;bottom:3px;font-size:.6rem;padding:2px 3px;letter-spacing:0}
 .pic.sm{width:64px;height:64px;border-radius:12px;flex:none}
 .pic.big{width:170px;height:170px;border-radius:22px;margin:0 auto;box-shadow:var(--shadow)}
 .tile .t{padding:10px 12px 12px}
@@ -131,8 +133,8 @@ nav .collect.on{color:var(--ink)}
 .btn.wide{width:100%}
 
 /* detail sheet */
-#sheet{position:fixed;inset:0;z-index:1100;background:var(--bg);display:none;flex-direction:column;overflow:auto}
-#sheet.on{display:flex}
+#sheet,#paint{position:fixed;inset:0;z-index:1100;background:var(--bg);display:none;flex-direction:column;overflow:auto}
+#sheet.on,#paint.on{display:flex}
 .hero{position:relative;height:64vh;min-height:320px;flex:none;background:radial-gradient(circle at 50% 35%,#ffffff,#d9e2f5 70%)}
 @media (prefers-color-scheme:dark){.hero{background:radial-gradient(circle at 50% 35%,#2c3a63,#0d1222 75%)}}
 #stage{position:absolute;inset:0}
@@ -175,14 +177,30 @@ nav .collect.on{color:var(--ink)}
 #splash p{opacity:.85;max-width:320px;margin:8px 0 28px}
 #splash .steps{text-align:left;max-width:320px;margin-bottom:28px}
 .leaflet-control-attribution{font-size:10px}
+/* quiz, passport, painter, confetti, toast */
+.quiz{display:grid;gap:8px;margin:0 0 14px}
+.quiz .btn{background:var(--bg);color:var(--ink);border:2px solid var(--line)}
+.quiz .btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}.quiz .btn.no{background:#d64545;border-color:#d64545;color:#fff}
+.stamps{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:10px 8px}
+.stamp{text-align:center;font-size:.7rem;color:var(--muted);line-height:1.2}
+.stamp span{display:grid;place-items:center;aspect-ratio:1;border-radius:50%;border:2px dashed var(--line);font:700 1rem var(--hfont);margin-bottom:4px;overflow:hidden}
+.stamp.got span{border:3px solid var(--accent)}.stamp img{width:100%;height:100%;object-fit:cover}
+.pal{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px 0}
+.pal button{width:42px;height:42px;border-radius:50%;border:3px solid var(--line);cursor:pointer}
+.pal button.on{outline:3px solid var(--brand-2);outline-offset:2px}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:1260;overflow:hidden}
+.confetti i{position:absolute;left:50%;top:38%;width:9px;height:14px;border-radius:2px;animation:burst 1.5s cubic-bezier(.2,.8,.4,1) forwards}
+@keyframes burst{70%{opacity:1}to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+#toast{position:fixed;left:16px;right:16px;bottom:calc(var(--nav) + 16px + env(safe-area-inset-bottom));max-width:420px;margin:0 auto;background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:14px;z-index:1400;font-weight:600;text-align:center;box-shadow:var(--shadow);word-break:break-word}
+#toast[hidden],.btn[hidden]{display:none}
 #a2hs{position:fixed;z-index:700;left:12px;right:12px;top:calc(var(--head) + 10px + env(safe-area-inset-top));max-width:460px;margin:0 auto;background:var(--accent);color:var(--accent-ink);border-radius:16px;padding:12px 44px 12px 14px;box-shadow:0 8px 24px rgba(0,0,0,.3);font-size:.9rem;display:flex;flex-direction:column;gap:2px}
 #a2hs[hidden]{display:none}
 #a2hs svg{vertical-align:-3px}
 #a2hs-x{position:absolute;top:4px;right:4px;width:40px;height:40px;border:0;background:none;color:inherit;font-size:1.1rem;cursor:pointer}
 @media (orientation:landscape) and (max-height:560px){#a2hs{top:10px}}
-/* phone sideways on the Game tab: game goes full screen (header/nav hidden), ✕ returns to the map */
+/* phone sideways on the Game tab: game goes full screen (header/nav hidden), ← Back returns to the map */
 body[data-tab=game] #game-exit{display:grid}
-#game-exit{display:none;position:fixed;z-index:600;right:calc(12px + env(safe-area-inset-right));bottom:calc(var(--nav) + 12px + env(safe-area-inset-bottom));width:44px;height:44px;border-radius:50%;border:0;background:rgba(16,22,36,.7);color:#fff;font-size:1.2rem;cursor:pointer;place-items:center}
+#game-exit{display:none;position:fixed;z-index:600;right:calc(12px + env(safe-area-inset-right));bottom:calc(var(--nav) + 12px + env(safe-area-inset-bottom));height:44px;padding:0 16px;border-radius:99px;border:2px solid rgba(255,255,255,.8);background:rgba(16,22,36,.78);color:#fff;font:600 .95rem var(--hfont);white-space:nowrap;cursor:pointer;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.3)}
 @media (orientation:landscape) and (max-height:560px){
   body[data-tab=game] header,body[data-tab=game] nav{display:none}
   body[data-tab=game] main{top:0;bottom:0;left:env(safe-area-inset-left);right:env(safe-area-inset-right)}
@@ -249,7 +267,7 @@ body[data-tab=game] #game-exit{display:grid}
   <button data-v="game"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11.5" r="1"/><circle cx="18" cy="13.5" r="1"/></svg>Game</button>
 </nav>
 
-<button id="game-exit" aria-label="Leave game">✕</button>
+<button id="game-exit" aria-label="Back to the trail">← Back</button>
 <div id="a2hs" role="note" hidden>
   <b>Play full screen</b>
   <span>Safari's bars take up the screen. Tap <svg viewBox="0 0 24 24" width="18" height="18" aria-label="Share"><path d="M12 3v12M7 8l5-5 5 5M5 12v8h14v-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Share, then <b>Add to Home Screen</b>, and open Westies from your home screen.</span>
@@ -266,6 +284,18 @@ body[data-tab=game] #game-exit{display:grid}
 </div>
 
 <div class="overlay" id="yay" role="dialog" aria-modal="true" aria-labelledby="yay-t"><div class="pop" id="yaybox"></div></div>
+
+<div id="paint" role="dialog" aria-modal="true" aria-labelledby="p-title">
+  <div class="hero" style="height:58vh"><div id="pstage" style="position:absolute;inset:0;touch-action:none"></div>
+    <div class="hbar"><button id="p-close">← Back</button></div>
+    <div class="hint">Tap or drag on the Westie to paint · drag beside it to turn</div></div>
+  <div class="body"><div class="in">
+    <h2 id="p-title">Colour your own Westie</h2>
+    <div class="pal" id="pal" role="group" aria-label="Paint colour"></div>
+    <div class="acts"><button class="btn ghost" id="p-clear">Clear</button><button class="btn y" id="p-save">Save picture</button></div>
+  </div></div>
+</div>
+<div id="toast" role="status" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -305,14 +335,16 @@ const NEAR_M = 40;
 const $ = id => document.getElementById(id);
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
 const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-let found = load('westie-found2', {}), favs = load('westie-favs', {});
+let found = load('westie-found2', {}), favs = load('westie-favs', {}), quizzes = load('westie-quiz', {}); // quiz: {stop: 1 right | 0 wrong}
 const count = () => Object.keys(found).length;
+const paws = () => Object.values(quizzes).filter(Boolean).length;
+const CERT = /[?&]cert=1/.test(location.search); // test hook: show the certificate button before all are found
 const thumbs = D.map(d => WestieStatue.thumb(d.id, 300));
 // Statue pictures: each design rendered on its plinth (transparent PNG) over the stop's street photo.
 // Pattern swatch shows until the render is ready; renders run one at a time in the background.
 const shots = [];
 const photo = i => { const p = (window.PHOTO_CREDITS || []).find(p => p.n === i + 1); return p ? `photos/${p.file.split('/').pop()}` : ''; };
-const pic = (i, cls = '') => `<span class="pic ${cls}" style="--photo:${photo(i) ? `url('${photo(i)}')` : 'none'}"><img data-pic="${i}" src="${shots[i] || thumbs[i]}" alt="Statue No. ${i + 1}"></span>`;
+const pic = (i, cls = '') => `<span class="pic ${cls}" style="--photo:${photo(i) ? `url('${photo(i)}')` : 'none'}"><img data-pic="${i}" src="${shots[i] || thumbs[i]}" alt="Statue No. ${i + 1}"><b class="code" aria-label="Code ${CODES[i]}">${CODES[i]}</b></span>`;
 function renderShots() {
   const box = document.createElement('div');
   box.style.cssText = 'position:fixed;left:-2000px;top:0;width:360px;height:360px';
@@ -353,10 +385,11 @@ document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
   show(b.dataset.v);
 });
 $('a2hs-x').onclick = () => { store('westie-a2hs-off', true); $('a2hs').hidden = true; };
-$('game-exit').onclick =() => { if (game) game.pause(); document.querySelector('nav [data-v=map]').click(); };
+// leaving ends the run: next visit to the Game tab starts fresh at the level menu
+$('game-exit').onclick = () => { if (game) { game.dispose(); game = null; $('game').innerHTML = ''; } document.querySelector('nav [data-v=map]').click(); };
 addEventListener('popstate', e => {
   const s = e.state || { v: 'map' };
-  sheet.classList.toggle('on', s.s != null);
+  sheet.classList.toggle('on', s.s != null); $('paint').classList.remove('on');
   if (s.s != null) open(s.s, true);
   show(s.v);
 });
@@ -438,9 +471,15 @@ function progress() {
   $('me').innerHTML = `
     <div class="ringcard"><div class="ring"><svg width="110" height="110"><circle cx="55" cy="55" r="48" stroke="rgba(255,255,255,.2)" stroke-width="10" fill="none"/>
       <circle cx="55" cy="55" r="48" stroke="#f4b41a" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - c / N)}"/></svg><b>${c}</b></div>
-      <div><h2>${c === N ? 'Trail complete!' : c ? 'Keep going!' : 'Ready to explore?'}</h2><p>${c} of ${N} Westies collected</p></div></div>
+      <div><h2>${c === N ? 'Trail complete!' : c ? 'Keep going!' : 'Ready to explore?'}</h2><p>${c} of ${N} Westies collected<br>🐾 ${paws()} bonus paw${paws() === 1 ? '' : 's'}</p></div></div>
+    <div class="acts"><button class="btn y" id="share">Share progress</button><button class="btn ghost" id="paintbtn">Colour a Westie</button></div>
     <h3 class="sec">Stars</h3>
     <div class="stars">${TIERS.map(([n, t]) => `<div class="star${c >= n ? ' got' : ''}"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z" fill="#f4b41a"/></svg><b>${t}</b><small>${n} Westies</small></div>`).join('')}</div>
+    <h3 class="sec">Trail passport</h3>
+    <div class="info"><div class="stamps">${LOCS.map((l, i) => found[i]
+      ? `<div class="stamp got"><span><img src="${thumbs[i]}" alt="No. ${i + 1} stamp"></span>${when(found[i])}</div>`
+      : `<div class="stamp"><span>${i + 1}</span>&nbsp;</div>`).join('')}</div>
+      ${c === N || CERT ? '<button class="btn y wide" id="cert" style="margin-top:14px">Download certificate</button>' : ''}</div>
     <h3 class="sec">How it works</h3>
     <div class="info"><ol class="steps"><li>Find a Westie using the map.</li><li>Look for the plaque on its plinth and note the 4-digit code.</li><li>Tap Collect and enter the code, or tap "I'm here" on the Westie's page.</li></ol></div>
     <h3 class="sec">About the trail</h3>
@@ -454,11 +493,110 @@ function progress() {
       <p style="font-size:.8rem">Everything also clears favourites and shows the welcome screen again. This can't be undone.</p>
     </div>`;
   document.querySelectorAll('[data-reset]').forEach(b => b.onclick = () => resetProgress(b.dataset.reset));
+  $('share').onclick = share; $('paintbtn').onclick = openPaint;
+  if ($('cert')) $('cert').onclick = certificate;
 }
+// found values are Date.now() timestamps; anything else (older saves) has no date
+const when = t => typeof t === 'number' && t > 1e12 ? new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '—';
+function download(url, name) { const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
+let toastT = 0;
+function toast(t) { const el = $('toast'); el.textContent = t; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 3500); }
+function share() {
+  const d = { title: 'Westies of Ayr', text: `I've found ${count()}/${N} Westies of Ayr! 🐾`, url: 'https://itsme2-boop.github.io/westies-of-ayr/' };
+  if (navigator.share) return navigator.share(d).catch(() => {}); // cancelled share: nothing to do
+  const t = d.text + ' ' + d.url;
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('Copied! Paste it to share your progress.'), () => toast(t));
+}
+function certificate() {
+  const W = 1200, H = 850, cv = document.createElement('canvas'), c = cv.getContext('2d');
+  cv.width = W; cv.height = H;
+  const g = c.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#14275a'); g.addColorStop(.6, '#2a4aa8'); g.addColorStop(1, '#8e5bb5');
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
+  c.strokeStyle = '#f4b41a'; c.lineWidth = 14; c.strokeRect(36, 36, W - 72, H - 72);
+  c.lineWidth = 3; c.strokeRect(62, 62, W - 124, H - 124);
+  const ts = Object.values(found).filter(t => typeof t === 'number' && t > 1e12);
+  const date = new Date(ts.length ? Math.max(...ts) : Date.now()).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  c.textAlign = 'center'; c.fillStyle = '#fff';
+  c.font = '600 40px Fredoka, sans-serif'; c.fillText('CERTIFICATE OF ACHIEVEMENT', W / 2, 190);
+  c.fillStyle = '#f4b41a'; c.font = '700 76px Fredoka, sans-serif'; c.fillText('Westies of Ayr Trail Complete', W / 2, 330, W - 160);
+  c.fillStyle = '#fff'; c.font = '500 36px Inter, sans-serif';
+  c.fillText(`All ${N} painted Westies found`, W / 2, 440);
+  c.fillText(date, W / 2, 520);
+  c.font = '600 44px Fredoka, sans-serif'; c.fillText(`🐾 ${paws()} bonus paw${paws() === 1 ? '' : 's'}`, W / 2, 640);
+  download(cv.toDataURL('image/png'), 'westies-of-ayr-certificate.png');
+}
+
+// ---------- quiz (one question per stop, same every time) ----------
+function quiz(i) {
+  let s = i + 1; const r = () => (s = (s * 16807) % 2147483647) / 2147483647; // seeded by stop number
+  for (let k = 0; k < 5; k++) r();
+  const k = i % 3, val = j => [D[j].name, D[j].artist, LOCS[j].place][k], a = val(i), opts = [a];
+  while (opts.length < 3) { const v = val(Math.floor(r() * N)); if (!opts.includes(v)) opts.push(v); }
+  for (let j = 2; j > 0; j--) { const x = Math.floor(r() * (j + 1)); [opts[j], opts[x]] = [opts[x], opts[j]]; }
+  return { q: ['What is this Westie\'s design called?', 'Who painted this Westie?', `Which stop is this? “${LOCS[i].desc}”`][k], opts, a };
+}
+
+// ---------- check-in fanfare: confetti + bark ----------
+let actx = null; // unlocked on a tap (iPhone only allows audio after a user gesture)
+['touchend', 'click'].forEach(t => addEventListener(t, () => {
+  try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); if (actx.state !== 'running') actx.resume(); } catch (e) {}
+}, { capture: true, passive: true }));
+function bark() {
+  try { if (localStorage.getItem('westie-game-sfx') === 'off') return; } catch (e) {} // the game's Sounds: Off switch
+  if (!actx || actx.state !== 'running') return;
+  [0, .2].forEach(d => { // same recipe as game.js SFX.bark2: two sawtooth yaps, 560 to 300 Hz, through a 900 Hz bandpass
+    const t = actx.currentTime + .02 + d, o = actx.createOscillator(), f = actx.createBiquadFilter(), g = actx.createGain();
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(560, t); o.frequency.exponentialRampToValueAtTime(300, t + .13);
+    f.type = 'bandpass'; f.frequency.value = 900; f.Q.value = 1.2;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.15, t + .01); g.gain.exponentialRampToValueAtTime(.001, t + .13);
+    o.connect(f); f.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + .15);
+  });
+}
+function confetti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const box = document.createElement('div'), cols = ['#f4b41a', '#8e5bb5', '#1f3b8a', '#1d9a63', '#e8457a', '#fff'];
+  box.className = 'confetti';
+  box.innerHTML = Array.from({ length: 70 }, (_, k) => `<i style="background:${cols[k % cols.length]};--dx:${(Math.random() * 100 - 50).toFixed(1)}vw;--dy:${(Math.random() * 70 - 15).toFixed(1)}vh;--r:${Math.round(Math.random() * 1080)}deg;animation-delay:${(Math.random() * .12).toFixed(2)}s"></i>`).join('');
+  document.body.appendChild(box); setTimeout(() => box.remove(), 1800);
+}
+
+// ---------- colour your own Westie ----------
+const PAL = [['Blue', '#1f5fd1'], ['Red', '#d62828'], ['Black', '#1b1b1b'], ['White', '#ffffff'], ['Yellow', '#f4b41a'], ['Green', '#2a9d4b'], ['Pink', '#ff70a6'], ['Purple', '#8e5bb5'], ['Brown', '#8a5a2b']];
+let pv = null, ink = PAL[0][1];
+$('pal').innerHTML = PAL.map(([n, c], k) => `<button style="background:${c}" data-c="${c}" aria-label="${n}" class="${k ? '' : 'on'}"></button>`).join('');
+$('pal').onclick = e => { const b = e.target.closest('button'); if (!b) return; ink = b.dataset.c; $('pal').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); };
+function openPaint() {
+  $('paint').classList.add('on');
+  if (pv) return;
+  pv = WestieStatue.mount($('pstage'), 0); // starts as Classic White (design 0)
+  // Paint a round blob at the texture spot under the finger; a drag that starts on the dog paints, elsewhere it turns.
+  const dab = e => {
+    const uv = pv.hit(e.clientX, e.clientY); if (!uv) return false;
+    const c = pv.canvas.getContext('2d'), S = pv.canvas.width;
+    c.fillStyle = ink; c.beginPath(); c.arc(uv.x * S, (1 - uv.y) * S, S * .04, 0, 7); c.fill(); pv.refresh();
+    return true;
+  };
+  let drag = false; const st = $('pstage');
+  // capture phase, so OrbitControls (listening on the canvas inside) sees enabled=false before it starts a turn
+  st.addEventListener('pointerdown', e => { drag = dab(e); pv.controls.enabled = !drag; }, true);
+  st.addEventListener('pointermove', e => { if (drag) dab(e); }, true);
+  addEventListener('pointerup', () => { drag = false; pv.controls.enabled = true; });
+  addEventListener('pointercancel', () => { drag = false; pv.controls.enabled = true; });
+}
+$('p-close').onclick = () => $('paint').classList.remove('on');
+$('p-clear').onclick = () => pv && pv.setDesign(0);
+$('p-save').onclick = () => {
+  const gl = pv.render(), cv = document.createElement('canvas'), c = cv.getContext('2d'); // copy in the same task as the render
+  cv.width = gl.width; cv.height = gl.height;
+  const g = c.createRadialGradient(cv.width / 2, cv.height * .35, 0, cv.width / 2, cv.height * .35, cv.height * .8);
+  g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#d9e2f5'); c.fillStyle = g; c.fillRect(0, 0, cv.width, cv.height);
+  c.drawImage(gl, 0, 0);
+  download(cv.toDataURL('image/png'), 'my-westie.png');
+};
 function resetProgress(what) {
   const ask = { trail: 'Clear all collected Westies?', game: 'Clear all game best times and stars?', all: 'Clear ALL progress, game scores and favourites?' }[what];
   if (!confirm(ask)) return;
-  if (what !== 'game') { found = {}; store('westie-found2', found); }
+  if (what !== 'game') { found = {}; store('westie-found2', found); quizzes = {}; store('westie-quiz', quizzes); }
   try { // game saves every level's best time under keys starting westie-game-best
     if (what !== 'trail') Object.keys(localStorage).filter(k => k.startsWith('westie-game-best')).forEach(k => localStorage.removeItem(k));
     if (what === 'all') { favs = {}; ['westie-favs', 'westie-seen'].forEach(k => localStorage.removeItem(k)); }
@@ -517,22 +655,36 @@ $('s-next').onclick = () => open(cur + 1);
 function collect(i) {
   found[i] = Date.now(); store('westie-found2', found); render();
   if (sheet.classList.contains('on') && cur === i) open(i, true);
-  const c = count(), star = TIERS.find(([n]) => n === c);
+  const c = count(), star = TIERS.find(([n]) => n === c), qz = !(i in quizzes) && quiz(i);
+  const who = `<b>${esc(D[i].name)}</b> by ${esc(D[i].artist)}<br>`;
+  // the name/artist line is held back until the bonus question is answered (it would give the answer away)
   $('yaybox').innerHTML = `${pic(i, 'big')}<h2 id="yay-t">You found No. ${i + 1}!</h2>
-    <p><b>${esc(D[i].name)}</b> by ${esc(D[i].artist)}<br>${c} of ${N} collected${star ? `<br>⭐ New star: <b>${star[1]}</b>` : ''}</p>
-    <button class="btn y wide" id="yayok">Brilliant!</button>`;
-  $('yay').classList.add('on'); $('yayok').focus();
+    <p id="yaytxt">${qz ? '' : who}${c} of ${N} collected${star ? `<br>⭐ New star: <b>${star[1]}</b>` : ''}</p>
+    ${qz ? `<p style="margin-bottom:10px"><b>Bonus paw question</b><br>${esc(qz.q)}</p><div class="quiz" id="quiz">${qz.opts.map(o => `<button class="btn">${esc(o)}</button>`).join('')}</div>` : ''}
+    <button class="btn y wide" id="yayok"${qz ? ' hidden' : ''}>Brilliant!</button>`;
+  $('yay').classList.add('on'); (qz ? $('quiz').firstChild : $('yayok')).focus();
   $('yayok').onclick = () => $('yay').classList.remove('on');
+  if (qz) $('quiz').onclick = e => {
+    const b = e.target.closest('button'); if (!b || i in quizzes) return;
+    const right = b.textContent === qz.a;
+    quizzes[i] = right ? 1 : 0; store('westie-quiz', quizzes); progress();
+    $('quiz').querySelectorAll('button').forEach(x => { x.disabled = true; if (x.textContent === qz.a) x.classList.add('ok'); else if (x === b) x.classList.add('no'); });
+    $('yaytxt').innerHTML = (right ? '🐾 Right! You earned a bonus paw.<br>' : `Not quite. The answer is <b>${esc(qz.a)}</b>.<br>`) + who + $('yaytxt').innerHTML;
+    $('yayok').hidden = false; $('yayok').focus();
+  };
+  confetti(); bark();
 }
 addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if ($('yay').classList.contains('on')) $('yay').classList.remove('on');
+  else if ($('paint').classList.contains('on')) $('paint').classList.remove('on');
   else if (sheet.classList.contains('on')) close();
 });
 
 function render() { $('prog').textContent = count() + ' / ' + N; pins(); grid(); progress(); if (sel != null) pick(sel); }
 
 console.assert(D.length === N && CODES.length === N && new Set(CODES).size === N && CODES.every(c => /^\d{4}$/.test(c)), 'trail data mismatch');
+console.assert(D.every((d, i) => { const q = quiz(i), q2 = quiz(i); return new Set(q.opts).size === 3 && q.opts.includes(q.a) && q.opts.join() === q2.opts.join(); }), 'quiz: bad question');
 render();
 setTimeout(renderShots, 300);
 // index.html#s5 opens statue 5 (for QR codes on plinths)

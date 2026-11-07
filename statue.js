@@ -422,8 +422,9 @@
     c.fillStyle = '#5b3a1a'; c.fillRect(0, 0, 512, 160);
     c.strokeStyle = '#d4a537'; c.lineWidth = 10; c.strokeRect(10, 10, 492, 140);
     c.fillStyle = '#f6dc8a'; c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.font = 'bold 60px Georgia, serif'; c.fillText('No. ' + (id + 1 < 10 ? '0' : '') + (id + 1), 256, 62);
-    c.font = 'italic 30px Georgia, serif'; c.fillText(d.name, 256, 118, 470);
+    var code = typeof CODES !== 'undefined' && CODES[id]; // CODES is index.html's plaque-code list
+    c.font = 'bold 50px Georgia, serif'; c.fillText('No. ' + (id + 1 < 10 ? '0' : '') + (id + 1) + (code ? '  ·  ' + code : ''), 256, 56, 470);
+    c.font = 'italic 30px Georgia, serif'; c.fillText(d.name, 256, 116, 470);
   }
 
 
@@ -713,6 +714,17 @@
         setDesign(n); resize(); controls.update(); renderer.render(scene, cam);
         return renderer.domElement.toDataURL('image/png');
       },
+      // Painter hooks: the skin canvas (SxS), mark it changed, and the UV under a screen point (null if off the dog).
+      canvas: cv, controls: controls,
+      refresh: function () { tex.needsUpdate = true; },
+      hit: function (x, y) {
+        var r = renderer.domElement.getBoundingClientRect();
+        var ray = new THREE.Raycaster(); ray.setFromCamera({ x: (x - r.left) / r.width * 2 - 1, y: -(y - r.top) / r.height * 2 + 1 }, cam);
+        var h = ray.intersectObject(dog, true)[0];
+        return h && h.uv ? h.uv : null;
+      },
+      // Render now and return the WebGL canvas: copy it in the same task (no preserveDrawingBuffer).
+      render: function () { renderer.render(scene, cam); return renderer.domElement; },
       dispose: function () {
         cancelAnimationFrame(raf);
         if (ro) ro.disconnect(); else window.removeEventListener('resize', resize);
