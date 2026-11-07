@@ -177,6 +177,9 @@ nav .collect.on{color:var(--ink)}
 #splash p{opacity:.85;max-width:320px;margin:8px 0 28px}
 #splash .steps{text-align:left;max-width:320px;margin-bottom:28px}
 .leaflet-control-attribution{font-size:10px}
+body:has(.wg-screen.wg-on) #game-exit{display:none!important}
+.clu{width:40px;height:40px;border-radius:50%;background:#1b2440;color:#f6dc8a;border:3px solid #fff;display:grid;place-items:center;font:800 1rem var(--hfont);box-shadow:0 3px 10px rgba(0,0,0,.35)}
+.leaflet-cluster-anim .leaflet-marker-icon,.leaflet-cluster-anim .leaflet-marker-shadow{transition:transform .3s ease-out,opacity .3s ease-in}
 /* quiz, passport, painter, confetti, toast */
 .quiz{display:grid;gap:8px;margin:0 0 14px}
 .quiz .btn{background:var(--bg);color:var(--ink);border:2px solid var(--line)}
@@ -298,6 +301,7 @@ body[data-tab=game] #game-exit{display:grid}
 <div id="toast" role="status" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="locations.js"></script>
@@ -331,7 +335,7 @@ WestieStatue.designs.forEach((d, i) => d.id = i);
 const LOCS = window.LOCATIONS, D = WestieStatue.designs, N = LOCS.length;
 // 4-digit code on each plaque, by stop. shortcut: codes live in page source, move server-side if prizes are at stake.
 // Bump on every publish; shown on the Progress tab.
-const APP_VERSION = '1.4';
+const APP_VERSION = '1.5';
 const CODES = ['4821','1739','6054','2917','8362','5408','3176','9625','7043','1588','6297','4130','8814','2569','7351','3942','5786','9013','1264','6679','3508','8247','4695','2031','7920','5317','9468','1852','6143','3790','8576'];
 const NEAR_M = 40;
 const $ = id => document.getElementById(id);
@@ -402,7 +406,9 @@ const map = L.map('map', { zoomControl: false }).setView([55.455, -4.63], 13);
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles © Esri' }).addTo(map);
 L.polyline(LOCS.map(l => [l.lat, l.lng]), { color: '#8e5bb5', weight: 4, opacity: .55, dashArray: '2 9', lineCap: 'round' }).addTo(map);
 let sel = null;
-const markers = LOCS.map((l, i) => L.marker([l.lat, l.lng], { title: D[i].name, keyboard: true }).on('click', () => pick(i)).addTo(map));
+const cluster = L.markerClusterGroup ? L.markerClusterGroup({ maxClusterRadius: 36, showCoverageOnHover: false, spiderfyOnMaxZoom: true, iconCreateFunction: c => L.divIcon({ className: '', html: `<div class="clu">${c.getChildCount()}</div>`, iconSize: [40, 40] }) }) : null;
+const markers = LOCS.map((l, i) => L.marker([l.lat, l.lng], { title: D[i].name, keyboard: true }).on('click', () => pick(i)).addTo(cluster || map));
+if (cluster) map.addLayer(cluster);
 map.fitBounds(L.latLngBounds(LOCS.map(l => [l.lat, l.lng])), { padding: [30, 30] });
 map.on('click', () => { sel = null; $('mapcard').hidden = true; pins(); });
 function pick(i) {
