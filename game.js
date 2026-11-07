@@ -1040,9 +1040,13 @@
         P(box(0.08, 0.35, 0.08), '#2e1d12', 0.25, 0.17, 0.1), P(box(0.08, 0.35, 0.08), '#2e1d12', 0.25, 0.17, -0.1), P(box(0.08, 0.35, 0.08), '#2e1d12', -0.25, 0.17, 0.1), P(box(0.08, 0.35, 0.08), '#2e1d12', -0.25, 0.17, -0.1)]);
       var badgerGeo = merge([P(ball(1, 10, 8), '#7b7b7b', 0, 0.36, 0, null, [0.48, 0.24, 0.3]), P(ball(1, 10, 8), '#f4f4f4', 0.48, 0.4, 0, null, [0.2, 0.15, 0.15]), P(box(0.3, 0.06, 0.05), '#111111', 0.5, 0.52, 0.06), P(box(0.3, 0.06, 0.05), '#111111', 0.5, 0.52, -0.06),
         P(ball(0.04), '#111111', 0.68, 0.38, 0), P(box(0.12, 0.2, 0.12), '#1a1a1a', 0.28, 0.1, 0.17), P(box(0.12, 0.2, 0.12), '#1a1a1a', 0.28, 0.1, -0.17), P(box(0.12, 0.2, 0.12), '#1a1a1a', -0.28, 0.1, 0.17), P(box(0.12, 0.2, 0.12), '#1a1a1a', -0.28, 0.1, -0.17)]);
+      function clearRun(c, q) { // the centre-to-centre run (half-width 0.5) misses every collider: plinths in dead ends, clearing logs
+        var x0 = Math.min(cc(c[0]), cc(q[0])) - 0.5, x1 = Math.max(cc(c[0]), cc(q[0])) + 0.5, z0 = Math.min(cc(c[1]), cc(q[1])) - 0.5, z1 = Math.max(cc(c[1]), cc(q[1])) + 0.5;
+        return !boxes.some(function (b) { return x1 > b[0] && x0 < b[2] && z1 > b[1] && z0 < b[3]; });
+      }
       function nextCell(c, prev) {
-        var ls = links(c[0], c[1]), opts = ls.filter(function (q) { return !prev || q[0] !== prev[0] || q[1] !== prev[1]; });
-        if (!opts.length) opts = ls;
+        var ls = links(c[0], c[1]).filter(function (q) { return clearRun(c, q); }), opts = ls.filter(function (q) { return !prev || q[0] !== prev[0] || q[1] !== prev[1]; });
+        if (!opts.length) opts = ls.length ? ls : links(c[0], c[1]);
         return opts[Math.floor(Math.random() * opts.length)];
       }
       var homes = cells.filter(function (c) { return c.d >= 5 && !taken[c.i + ',' + c.j]; });
@@ -1076,8 +1080,10 @@
             else if (Math.hypot(w.tx - w.x, w.tz - w.z) < 0.5 || safe) { var c = cells[Math.floor(Math.random() * cells.length)]; w.tx = cc(c.i); w.tz = cc(c.j); }
             var dx = w.tx - w.x, dz = w.tz - w.z, l = Math.hypot(dx, dz) || 1, st = Math.min(l, sp * dt);
             w.x += dx / l * st; w.z += dz / l * st;
-            w.m.position.set(w.x, 0.9 + Math.sin(T * 2 + w.ph) * 0.25, w.z); w.m.rotation.y = lerpAngle(w.m.rotation.y, Math.atan2(-dz, dx), Math.min(1, dt * 5));
-            if (inv <= 0 && state === 'play' && d < 0.7 + PR) hurt(px - w.x, pz - w.z);
+            // fly above the pines (tops ~3.9) and only dive to dog height when right over the dog, so they never pass through hedges
+            w.h = (w.h == null ? 4.4 : w.h) + ((chase && d < 2.2 ? 0.9 : 4.4) - (w.h == null ? 4.4 : w.h)) * Math.min(1, dt * 3);
+            w.m.position.set(w.x, w.h + Math.sin(T * 2 + w.ph) * 0.25, w.z); w.m.rotation.y = lerpAngle(w.m.rotation.y, Math.atan2(-dz, dx), Math.min(1, dt * 5));
+            if (inv <= 0 && state === 'play' && w.h < 1.6 && d < 0.7 + PR) hurt(px - w.x, pz - w.z);
           });
         }
         critters.forEach(function (c) {
@@ -1618,7 +1624,9 @@
         crabs.forEach(function (c) {
           if (Math.hypot(c.tx - c.x, c.tz - c.z) < 0.3) { c.tx = Math.max(-18, Math.min(26, c.ox + (Math.random() - 0.5) * 16)); c.tz = Math.max(-32, Math.min(32, c.oz + (Math.random() - 0.5) * 10)); }
           var dx = c.tx - c.x, dz = c.tz - c.z, l = Math.hypot(dx, dz) || 1, st = Math.min(l, 1.8 * dt);
-          c.x += dx / l * st; c.z += dz / l * st;
+          var q = collide(c.x + dx / l * st, c.z + dz / l * st, 0.5, boxes);
+          if (Math.hypot(q[0] - c.x, q[1] - c.z) < st * 0.5) { c.tx = q[0]; c.tz = q[1]; } // blocked by a groyne, rock or plinth: pick a new spot next frame
+          c.x = q[0]; c.z = q[1];
           c.m.position.set(c.x, Math.abs(Math.sin(T * 14 + c.ph)) * 0.04, c.z); c.m.rotation.y = Math.atan2(-dz, dx) + Math.PI / 2; // sideways
           if (inv <= 0 && state === 'play' && Math.hypot(px - c.x, pz - c.z) < 0.5 + PR) hurt(px - c.x, pz - c.z);
         });
