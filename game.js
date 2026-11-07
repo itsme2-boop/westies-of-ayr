@@ -108,6 +108,7 @@
     hogmanay: '<svg viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" fill="#2b2457"/><circle cx="14" cy="12" r="7" fill="none" stroke="#ff4fa0" stroke-width="2" stroke-dasharray="2 3"/><circle cx="36" cy="10" r="6" fill="none" stroke="#ffd166" stroke-width="2" stroke-dasharray="2 3"/><rect x="6" y="26" width="14" height="18" fill="#c47a62"/><rect x="24" y="22" width="12" height="22" fill="#d9c3a5"/><rect x="38" y="28" width="10" height="16" fill="#a9c1d3"/><g fill="#ffd27a"><rect x="9" y="30" width="3" height="3"/><rect x="27" y="27" width="3" height="3"/><rect x="41" y="32" width="3" height="3"/></g><path d="M0 44h52v8H0z" fill="#eef3f8"/><path d="M5 26h16l-2-3H7zM23 22h14l-2-3H25z" fill="#fff"/></svg>',
     racecourse: '<svg viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" fill="#8fc96a"/><rect x="6" y="14" width="40" height="24" rx="12" fill="none" stroke="#5f9a3e" stroke-width="7"/><rect x="6" y="14" width="40" height="24" rx="12" fill="none" stroke="#fff" stroke-width="1"/><path d="M20 30l4-4h7l3-3 2 2-3 3v4h-2v-3h-6l-2 3h-2z" fill="#5d4037"/><circle cx="27" cy="23" r="2" fill="#e63946"/></svg>',
     harbour: '<svg viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" fill="#0f1b33"/><path d="M38 10l4 24h-8z" fill="#e8e8e8"/><rect x="36" y="7" width="4" height="4" fill="#ffd166"/><path d="M40 9L52 4v10z" fill="#ffd166" opacity=".5"/><rect y="34" width="52" height="18" fill="#1d3557"/><path d="M6 34h18l-3 5H9z" fill="#c1121f"/><rect x="13" y="26" width="2" height="8" fill="#ddd"/><path d="M0 44h52v8H0z" fill="#59606b"/><path d="M26 44l10-6 6 6z" fill="#ffd166" opacity=".35"/></svg>',
+    winterpark: '<svg viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" fill="#9cc3e6"/><path d="M0 18l6-12 6 12zM40 20l6-13 6 13z" fill="#2f5d3a"/><path d="M3.5 11l2.5-5 2.5 5zM43.5 13l2.5-6 2.5 6z" fill="#fff"/><path d="M0 36q26-6 52 0v16H0z" fill="#f1f5fa"/><ellipse cx="38" cy="45" rx="10" ry="3" fill="#cde9f7"/><circle cx="16" cy="34" r="7" fill="#fff"/><circle cx="16" cy="24" r="5" fill="#fff"/><circle cx="16" cy="16" r="3.6" fill="#fff"/><rect x="12" y="8" width="8" height="5" fill="#1d1d1f"/><rect x="10.5" y="12.5" width="11" height="1.5" fill="#1d1d1f"/><path d="M19 16l5 1-5 1z" fill="#f77f00"/><rect x="11.5" y="19.5" width="9" height="2.5" fill="#c8102e"/><path d="M28 36h10l2-3h2l-1 4v5h-2v-3h-8v3h-2v-5l-2-2z" fill="#7b4a26"/><rect x="29" y="35" width="8" height="3" fill="#e63946"/><g fill="#fff"><circle cx="30" cy="8" r="1"/><circle cx="24" cy="4" r=".8"/><circle cx="34" cy="16" r=".8"/><circle cx="8" cy="26" r=".8"/><circle cx="45" cy="26" r="1"/></g></svg>',
     tower7: '<svg viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" fill="#a9d3f5"/><rect x="16" y="8" width="20" height="44" fill="#d6c4a4"/><g fill="#34495a"><rect x="20" y="13" width="4" height="4"/><rect x="28" y="13" width="4" height="4"/><rect x="20" y="20" width="4" height="4"/><rect x="28" y="20" width="4" height="4"/><rect x="20" y="27" width="4" height="4"/><rect x="28" y="27" width="4" height="4"/><rect x="20" y="34" width="4" height="4"/><rect x="28" y="34" width="4" height="4"/></g><rect x="14" y="5" width="24" height="4" fill="#4f9443"/><circle cx="19" cy="4" r="3" fill="#3f8a3a"/><circle cx="32" cy="4" r="3" fill="#e86a8a"/><rect x="23" y="42" width="6" height="10" fill="#7a4a2a"/></svg>',
     tower: '<svg viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" fill="#f6c690"/><rect x="12" y="10" width="28" height="38" fill="#a4553a"/><path d="M10 10h32l-4-6H14z" fill="#5b3a2c"/><g fill="#ffe7a8"><rect x="16" y="14" width="5" height="6"/><rect x="31" y="14" width="5" height="6"/><rect x="16" y="25" width="5" height="6"/><rect x="31" y="25" width="5" height="6"/></g><rect x="23" y="36" width="6" height="12" fill="#3b2a20"/><g stroke="#6b4a2f" stroke-width="1.6"><path d="M43 48V20M48 48V20M43 26h5M43 32h5M43 38h5M43 44h5"/></g></svg>'
   };
@@ -217,6 +218,11 @@
     harbour: { bpm: 100, sub: 1, drone: ['A2'], droneVol: 0.035, drum: 'X . x', drumVol: 0.35, voices: [
       { ins: 'flute', vol: 0.28, seq: seq('A4 - C5 | E5 - D5 | C5 - B4 | A4 - - | G4 - B4 | D5 - C5 | B4 - G4 | E4 - - | A4 - C5 | E5 - A5 | G5 - E5 | D5 - - | C5 - B4 | A4 - G4 | E4 - G4 | A4 - - |') },
       { ins: 'bass', vol: 0.26, seq: seq('A2 E3 E3 | A2 E3 E3 | F2 C3 C3 | E2 B2 B2 |') }] },
+    // Gentle snowy waltz in F: flute with sleigh-bell plucks and a slow bass (a softer cousin of the Hogmanay reel).
+    winterpark: { bpm: 108, sub: 3, drone: ['F2', 'C3'], droneVol: 0.04, drum: 'X . . x . .', drumVol: 0.35, voices: [
+      { ins: 'flute', vol: 0.28, seq: seq('C5 F5 A5 | G5 - F5 | E5 G5 C6 | A5 - - | F5 A5 C6 | D6 C6 A5 | G5 A5 G5 | F5 - - | A5 C6 D6 | C6 A5 F5 | G5 - E5 | C5 - - | F5 G5 A5 | C6 A5 F5 | E5 G5 E5 | F5 - - |') },
+      { ins: 'pluck', vol: 0.12, seq: seq('F6 . . | C6 . . | E6 . . | F6 . . | A6 . . | F6 . . | E6 . . | F6 . . |') },
+      { ins: 'bass', vol: 0.26, seq: seq('F2 - - | F2 - - | C3 - - | F2 - - | F2 - - | D3 - - | C3 - - | F2 - - |') }] },
     // Driving A dorian reel feel; the game speeds it up floor by floor.
     tower7: { bpm: 126, sub: 2, drone: ['A2', 'E3'], droneVol: 0.045, drum: 'X . x . X x x .', drumVol: 0.55, voices: [
       { ins: 'pipe', vol: 0.2, seq: seq('A4 C5 E5 A5 | G5 E5 D5 E5 | C5 D5 E5 G5 | A5 - G5 E5 | A4 C5 E5 A5 | B5 A5 G5 E5 | D5 E5 G5 E5 | A5 - - . | E5 A5 A5 B5 | C6 B5 A5 G5 | E5 G5 D5 G5 | E5 D5 C5 B4 | A4 C5 E5 A5 | G5 E5 D5 B4 | C5 B4 G4 B4 | A4 - - . |') },
@@ -1809,6 +1815,98 @@
       };
     }
 
+    // ================= Level 10: Snowy Park =================
+    // A park under fresh snow: snowmen, snowy pines and hedges, benches and lamps round a frozen (slippery) pond.
+    // Other dogs in winter coats run about and give chase when you get close. Light snow falls round the player.
+    function buildWinterPark() {
+      var R = rng(1010), grp = new THREE.Group(), boxes = [], k;
+      function solid(x, z, hw, hd) { boxes.push([x - hw, z - hd, x + hw, z + hd]); }
+      grp.add(groundPlane(-56, -44, 56, 44, 1024, function (rect, dot, K, c, map) {
+        rect(-56, -44, 56, 44, '#f1f5fa'); speckle(c, 12000, ['rgba(150,170,200,.18)', 'rgba(255,255,255,.6)', 'rgba(120,140,170,.1)']);
+        rect(-56, 16.6, 56, 19.4, '#dce3ec'); rect(-13.4, -44, -10.6, 44, '#dce3ec'); // trodden paths
+        c.strokeStyle = '#dce3ec'; c.lineWidth = 2.8 * K; c.beginPath(); var o = map(0, 0); c.arc(o[0], o[1], 10 * K, 0, 7); c.stroke();
+        for (k = 0; k < 40; k++) { var px0 = -50 + Math.random() * 100, pz0 = -40 + Math.random() * 80; dot(px0, pz0, 0.15, 'rgba(120,140,170,.35)'); dot(px0 + 0.5, pz0 + 0.3, 0.15, 'rgba(120,140,170,.35)'); } // paw prints
+      }));
+      // Frozen pond: shiny ice you slide on (no grip, like the Hogmanay ice).
+      var ice = new THREE.Mesh(new THREE.CircleGeometry(7, 32).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: col('#cde9f7'), roughness: 0.05, metalness: 0.35 }));
+      ice.position.y = 0.02; ice.receiveShadow = true; grp.add(ice);
+      // Edge hedges with snow on top mark the park boundary.
+      var hedges = [[0, -36.5, 94, 1], [0, 36.5, 94, 1], [-46.5, 0, 1, 74], [46.5, 0, 1, 74]];
+      grp.add(inst(merge([P(box(1, 1, 1), '#3f6b3a', 0, 0.5, 0), P(box(1.02, 0.18, 1.02), '#ffffff', 0, 1.05, 0)]), vmat, hedges.map(function (h) { return { x: h[0], z: h[1], sx: h[2], sy: 1.3, sz: h[3] }; })));
+      boxes.push([46, -400, 400, 400], [-400, -400, -46, 400], [-400, -400, 400, -36], [-400, 36, 400, 400]);
+      // Snowmen: stacked snowballs, coal eyes and buttons, carrot nose, hat, scarf and twig arms.
+      var snowmen = [[-30, -20], [-10, -26], [14, -14], [30, -30], [-34, 0], [-16, 8], [18, 6], [34, 14], [-6, 26], [14, 28], [-40, 30], [42, -20]];
+      var smGeo = merge([P(ball(0.8, 12, 10), '#ffffff', 0, 0.7, 0), P(ball(0.55, 12, 10), '#f8fbff', 0, 1.65, 0), P(ball(0.38, 12, 10), '#ffffff', 0, 2.35, 0),
+        P(new THREE.ConeGeometry(0.07, 0.4, 6), '#f77f00', 0.48, 2.33, 0, [0, 0, -Math.PI / 2]), P(ball(0.05), '#111111', 0.33, 2.45, 0.12), P(ball(0.05), '#111111', 0.33, 2.45, -0.12),
+        P(ball(0.06), '#111111', 0.54, 1.75, 0), P(ball(0.06), '#111111', 0.55, 1.5, 0), P(cyl(0.26, 0.26, 0.4, 10), '#1d1d1f', 0, 2.85, 0), P(cyl(0.42, 0.42, 0.05, 12), '#1d1d1f', 0, 2.64, 0),
+        P(cyl(0.42, 0.46, 0.14, 10), '#c8102e', 0, 2.02, 0), P(box(0.08, 0.45, 0.16), '#c8102e', 0.25, 1.8, 0.28), P(cyl(0.03, 0.03, 0.9, 4), '#5b3a22', 0, 1.8, 0.75, [1.0, 0, 0]), P(cyl(0.03, 0.03, 0.9, 4), '#5b3a22', 0, 1.8, -0.75, [-1.0, 0, 0])]);
+      var sm = inst(smGeo, vmat, snowmen.map(function (s) { solid(s[0], s[1], 0.85, 0.85); return { x: s[0], z: s[1], ry: R() * 6 }; })); sm.castShadow = true; grp.add(sm);
+      // Benches round the pond, facing the ice, and lamp posts along the paths.
+      var benches = [[-9, -9], [9, -9], [-9, 9], [9, 9]].map(function (b) { solid(b[0], b[1], 1.0, 1.0); return { x: b[0], z: b[1], ry: Math.atan2(-b[0], -b[1]) }; });
+      grp.add(inst(merge([P(box(2, 0.1, 0.6), '#6b4a2f', 0, 0.45, 0), P(box(2, 0.5, 0.08), '#6b4a2f', 0, 0.8, -0.28), P(box(0.1, 0.45, 0.5), '#2f3640', 0.85, 0.22, 0), P(box(0.1, 0.45, 0.5), '#2f3640', -0.85, 0.22, 0), P(box(1.9, 0.08, 0.5), '#ffffff', 0, 0.54, 0.03)]), vmat, benches));
+      var lamps = [[-40, 19.6], [-24, 19.6], [8, 19.6], [32, 19.6], [-10.4, -30], [-10.4, -14]].map(function (l) { solid(l[0], l[1], 0.2, 0.2); return { x: l[0], z: l[1] }; });
+      grp.add(inst(merge([P(cyl(0.08, 0.11, 3, 6), '#2f3640', 0, 1.5, 0), P(box(0.36, 0.4, 0.36), '#ffe08a', 0, 3.15, 0), P(new THREE.ConeGeometry(0.32, 0.25, 4), '#ffffff', 0, 3.47, 0, [0, Math.PI / 4, 0])]), vmat, lamps));
+      // Westies: one on a plinth in the middle of the frozen pond.
+      var spots = [[-38, -28], [-20, -12], [-40, 10], [-24, 26], [0, -30], [0, 0], [22, -26], [38, -8], [24, 18], [40, 28]];
+      var start = [0, 32];
+      // Snowy pines: a ring outside the hedges plus some in the park (kept clear of Westies, props, the start and the pond).
+      var trees = [], busy = spots.concat(snowmen, lamps.map(function (l) { return [l.x, l.z]; }), [start, [-9, -9], [9, -9], [-9, 9], [9, 9]]);
+      for (k = -52; k <= 52; k += 4) { trees.push({ x: k + R() * 2, z: -40 - R() * 3, s: 1.2 + R() * 0.5, ry: R() * 6 }, { x: k + R() * 2, z: 40 + R() * 3, s: 1.2 + R() * 0.5, ry: R() * 6 }); }
+      for (k = -36; k <= 36; k += 4) { trees.push({ x: -50 - R() * 3, z: k + R() * 2, s: 1.2 + R() * 0.5, ry: R() * 6 }, { x: 50 + R() * 3, z: k + R() * 2, s: 1.2 + R() * 0.5, ry: R() * 6 }); }
+      for (var inner = 0, k = 0; k < 300 && inner < 22; k++) {
+        var tx = -42 + R() * 84, tz = -32 + R() * 64;
+        if (Math.hypot(tx, tz) < 13 || Math.abs(tz - 18) < 2.5 || Math.abs(tx + 12) < 2.5 || busy.some(function (b) { return Math.hypot(tx - b[0], tz - b[1]) < 4.5; })) continue;
+        busy.push([tx, tz]); solid(tx, tz, 0.45, 0.45); inner++; trees.push({ x: tx, z: tz, s: 0.9 + R() * 0.4, ry: R() * 6 });
+      }
+      var tm = inst(merge([P(cyl(0.18, 0.24, 1.2, 6), '#5b3a22', 0, 0.6, 0), P(new THREE.ConeGeometry(1.5, 1.6, 7), '#2f5d3a', 0, 1.7, 0), P(new THREE.ConeGeometry(1.15, 1.4, 7), '#346a40', 0, 2.6, 0), P(new THREE.ConeGeometry(0.8, 1.2, 7), '#3a7546', 0, 3.4, 0),
+        P(new THREE.ConeGeometry(1.25, 0.5, 7), '#ffffff', 0, 2.3, 0), P(new THREE.ConeGeometry(0.9, 0.45, 7), '#ffffff', 0, 3.15, 0), P(new THREE.ConeGeometry(0.55, 0.5, 7), '#ffffff', 0, 3.85, 0)]), vmat, trees);
+      tm.castShadow = true; grp.add(tm);
+      var statues = makeStatues(spots, grp, boxes, R);
+      // Park dogs in winter coats (not Westies): wander, and give chase when you come close.
+      var dogs = [['#7b4a26', '#4a2c16', '#e63946', -28, -6], ['#2b2b2b', '#151515', '#2a9d8f', 10, -22], ['#d9a441', '#a8752a', '#3a86ff', 30, 0], ['#8d8f94', '#55575c', '#ffd166', -20, 16], ['#c46a2f', '#f4efe6', '#8338ec', 16, 24]].map(function (d, n) {
+        var g = merge([P(ball(1, 10, 8), d[0], 0, 0.7, 0, null, [0.6, 0.32, 0.3]), P(box(0.56, 0.3, 0.64), d[2], -0.02, 0.76, 0), P(ball(0.25), d[0], 0.62, 0.98, 0), P(box(0.26, 0.14, 0.16), d[0], 0.86, 0.93, 0),
+          P(ball(0.05), '#111111', 0.99, 0.97, 0), P(ball(0.04), '#111111', 0.8, 1.06, 0.1), P(ball(0.04), '#111111', 0.8, 1.06, -0.1), P(box(0.08, 0.24, 0.12), d[1], 0.56, 1.18, 0.15, [0.3, 0, 0]), P(box(0.08, 0.24, 0.12), d[1], 0.56, 1.18, -0.15, [-0.3, 0, 0]),
+          P(box(0.12, 0.5, 0.12), d[0], 0.35, 0.25, 0.15), P(box(0.12, 0.5, 0.12), d[0], 0.35, 0.25, -0.15), P(box(0.12, 0.5, 0.12), d[0], -0.35, 0.25, 0.15), P(box(0.12, 0.5, 0.12), d[0], -0.35, 0.25, -0.15), P(box(0.4, 0.08, 0.08), d[1], -0.7, 0.95, 0, [0, 0, 0.6])]);
+        var m = new THREE.Mesh(g, vmat); m.castShadow = true; m.scale.setScalar(1.3); grp.add(m);
+        return { m: m, x: d[3], z: d[4], ox: d[3], oz: d[4], tx: d[3], tz: d[4], ph: n };
+      });
+      // Light snowfall: one small particle system kept round the player.
+      var SN = 400, snPos = new Float32Array(SN * 3), snCv = document.createElement('canvas'); snCv.width = snCv.height = 16;
+      (function (c) { var gr = c.createRadialGradient(8, 8, 0, 8, 8, 8); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = gr; c.fillRect(0, 0, 16, 16); })(snCv.getContext('2d'));
+      for (k = 0; k < SN; k++) { snPos[k * 3] = start[0] + (R() - 0.5) * 44; snPos[k * 3 + 1] = R() * 14; snPos[k * 3 + 2] = start[1] + (R() - 0.5) * 44; }
+      var snGeo = new THREE.BufferGeometry(); snGeo.setAttribute('position', new THREE.BufferAttribute(snPos, 3));
+      var snow = new THREE.Points(snGeo, new THREE.PointsMaterial({ size: 0.25, map: new THREE.CanvasTexture(snCv), transparent: true, depthWrite: false })); snow.frustumCulled = false; grp.add(snow);
+      if (window.WESTIE_GAME_DEBUG) reachCheck('Snowy Park', boxes, start, spots, -46, -36, 46, 36);
+      function tick(dt) {
+        for (var i = 0; i < SN * 3; i += 3) {
+          snPos[i + 1] -= (1.1 + (i % 5) * 0.12) * dt; if (snPos[i + 1] < 0) snPos[i + 1] += 14;
+          snPos[i] += Math.sin(T * 0.8 + i) * 0.3 * dt;
+          if (snPos[i] - px > 22) snPos[i] -= 44; else if (snPos[i] - px < -22) snPos[i] += 44; // wrap round the player
+          if (snPos[i + 2] - pz > 22) snPos[i + 2] -= 44; else if (snPos[i + 2] - pz < -22) snPos[i + 2] += 44;
+        }
+        snGeo.attributes.position.needsUpdate = true;
+        dogs.forEach(function (d) {
+          var chase = state === 'play' && inv <= 0 && Math.hypot(px - d.x, pz - d.z) < 7;
+          if (chase) { d.tx = px; d.tz = pz; }
+          else if (Math.hypot(d.tx - d.x, d.tz - d.z) < 0.3) { d.tx = Math.max(-44, Math.min(44, d.ox + (Math.random() - 0.5) * 24)); d.tz = Math.max(-34, Math.min(34, d.oz + (Math.random() - 0.5) * 20)); }
+          var dx = d.tx - d.x, dz = d.tz - d.z, l = Math.hypot(dx, dz) || 1, st = Math.min(l, (chase ? 4.2 : 3) * dt);
+          var q = collide(d.x + dx / l * st, d.z + dz / l * st, 0.5, boxes);
+          if (Math.hypot(q[0] - d.x, q[1] - d.z) < st * 0.5) { d.tx = q[0]; d.tz = q[1]; } // blocked by a snowman, tree or plinth: pick a new spot next frame
+          d.x = q[0]; d.z = q[1];
+          d.m.position.set(d.x, Math.abs(Math.sin(T * 12 + d.ph)) * 0.12, d.z); d.m.rotation.y = lerpAngle(d.m.rotation.y, Math.atan2(-dz, dx), Math.min(1, dt * 10));
+          if (inv <= 0 && state === 'play' && Math.hypot(px - d.x, pz - d.z) < 0.7 + PR) hurt(px - d.x, pz - d.z);
+        });
+      }
+      return {
+        key: 'winterpark', title: 'Snowy Park', group: grp, boxes: boxes, statues: statues, start: start, cam: { h: 10, b: 10 },
+        env: { top: '#7fa9d6', sky: 0xe6eef7, near: 50, far: 120, hemi: 0.6, hemiSky: 0xeef4ff, ground: 0xb8c4d2, sun: 0.8, sunCol: 0xfff4e6, exposure: 0.8 },
+        slow: function () { return false; },
+        slide: function (x, z) { return Math.hypot(x, z) < 7; },
+        tick: tick, exit: null,
+        reset: function () { dogs.forEach(function (d) { d.x = d.tx = d.ox; d.z = d.tz = d.oz; }); }
+      };
+    }
+
     // ---- Player: the sculpted Westie from statue.js (design 0, plain white), with a red collar and a soft contact shadow.
     // It shares the decimated statue geometry, so it costs one extra draw call. Animation is a trotting bob, nose rock and turn lean.
     var player = new THREE.Group(), body = new THREE.Group(); player.add(body);
@@ -1840,7 +1938,8 @@
       { key: 'alloway', title: 'Alloway by Night', sub: '8 Westies · witches, fog', stars: [150, 240], best: BEST_KEY + '-alloway', fresh: true, build: function () { return buildForest(true); } },
       { key: 'hogmanay', title: 'Hogmanay Snow', sub: '10 Westies · ice, snowballs', stars: [160, 260], best: BEST_KEY + '-hogmanay', build: function () { return buildTown(true); } },
       { key: 'racecourse', title: 'Ayr Racecourse', sub: '8 Westies · horses, gates', stars: [110, 190], best: BEST_KEY + '-racecourse', build: function () { return buildRacecourse(); } },
-      { key: 'harbour', title: 'Harbour at Night', sub: '8 Westies · torch, forklift', stars: [130, 220], best: BEST_KEY + '-harbour', build: function () { return buildHarbour(); } }
+      { key: 'harbour', title: 'Harbour at Night', sub: '8 Westies · torch, forklift', stars: [130, 220], best: BEST_KEY + '-harbour', build: function () { return buildHarbour(); } },
+      { key: 'winterpark', title: 'Snowy Park', sub: '10 Westies · snowmen, dogs', stars: [150, 240], best: BEST_KEY + '-winterpark', build: function () { return buildWinterPark(); } }
     ];
     var LV = {}, KEYS = {}, STARS = {};
     LEVELS.forEach(function (l, i) { LV[l.key] = l; l.next = LEVELS[i + 1]; KEYS[l.key] = l.best; STARS[l.key] = l.stars; });
