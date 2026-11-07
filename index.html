@@ -53,6 +53,7 @@ nav .collect.on{color:var(--ink)}
 /* map */
 #map{height:100%}
 .map-card{position:absolute;left:12px;right:12px;bottom:12px;z-index:400;background:var(--card);border-radius:var(--r);box-shadow:0 6px 24px rgba(0,0,0,.18);display:flex;gap:12px;padding:10px;align-items:center;cursor:pointer;border:0;text-align:left;max-width:520px;margin:0 auto}
+.map-card[hidden]{display:none}
 .map-card img{width:64px;height:64px;border-radius:12px;flex:none}
 .map-card b{font-family:var(--hfont);font-size:1.05rem;display:block}
 .map-card small{color:var(--muted)}
@@ -175,11 +176,12 @@ nav .collect.on{color:var(--ink)}
 #splash .steps{text-align:left;max-width:320px;margin-bottom:28px}
 .leaflet-control-attribution{font-size:10px}
 /* phone sideways on the Game tab: game goes full screen (header/nav hidden), ✕ returns to the map */
-#game-exit{display:none;position:fixed;z-index:600;right:calc(12px + env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));width:44px;height:44px;border-radius:50%;border:0;background:rgba(16,22,36,.7);color:#fff;font-size:1.2rem;cursor:pointer;place-items:center}
+body[data-tab=game] #game-exit{display:grid}
+#game-exit{display:none;position:fixed;z-index:600;right:calc(12px + env(safe-area-inset-right));bottom:calc(var(--nav) + 12px + env(safe-area-inset-bottom));width:44px;height:44px;border-radius:50%;border:0;background:rgba(16,22,36,.7);color:#fff;font-size:1.2rem;cursor:pointer;place-items:center}
 @media (orientation:landscape) and (max-height:560px){
   body[data-tab=game] header,body[data-tab=game] nav{display:none}
   body[data-tab=game] main{top:0;bottom:0;left:env(safe-area-inset-left);right:env(safe-area-inset-right)}
-  body[data-tab=game] #game-exit{display:grid}
+  body[data-tab=game] #game-exit{bottom:calc(12px + env(safe-area-inset-bottom))}
 }
 </style>
 </head>
@@ -326,7 +328,7 @@ function show(v) {
   tab = v; document.body.dataset.tab = v;
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x.dataset.v === v));
   document.querySelectorAll('.view').forEach(el => el.classList.toggle('on', el.id === 'v-' + v));
-  if (v === 'map') map.invalidateSize();
+  if (v === 'map') setTimeout(() => map.invalidateSize(), 60); // after header/nav reappear and layout settles
   // game starts on first visit, pauses when another tab is shown
   if (v === 'game' && window.WestieGame) game ? game.resume() : (game = WestieGame.mount($('game')));
   else if (game) game.pause();

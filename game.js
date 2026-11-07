@@ -56,6 +56,8 @@
     '.wg-floor{display:none}.wg-tower .wg-floor{display:flex}',
     '.wg-btn{pointer-events:auto;min-width:44px;height:44px;border:1px solid var(--wg-edge);border-radius:999px;background:var(--wg-glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--wg-ink);font:inherit;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.16);display:grid;place-items:center;padding:0}',
     '.wg-btn svg{width:20px;height:20px;fill:currentColor}',
+    '.wg-mus{position:absolute;top:calc(60px + env(safe-area-inset-top));right:8px}.wg-mus svg{width:22px;height:22px}',
+    '@media (max-width:420px){.wg-bar{gap:4px}.wg-pill{padding:0 8px;font-size:16px}.wg-hearts svg{width:20px;height:20px}.wg-ico{width:19px;height:19px}}',
     '.wg-nav{position:absolute;top:calc(60px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);pointer-events:none;font-size:16px}',
     '.wg-arrow{display:inline-block;width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:22px solid #e09b00;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}',
     '.wg-joy{position:absolute;left:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.12),rgba(255,255,255,.32));border:2px solid rgba(255,255,255,.8);box-shadow:0 4px 16px rgba(0,0,0,.2);touch-action:none;display:none}',
@@ -87,6 +89,8 @@
     heart: '<path d="M12 21s-7.4-4.5-9.5-9.1C1 8.5 3.1 4.6 6.8 4.6c2.1 0 3.6 1.1 5.2 3 1.6-1.9 3.1-3 5.2-3 3.7 0 5.8 3.9 4.3 7.3C19.4 16.5 12 21 12 21z"/>',
     paw: '<ellipse cx="12" cy="16" rx="5" ry="4.2"/><circle cx="5.5" cy="10.5" r="2.2"/><circle cx="9.3" cy="6.6" r="2.3"/><circle cx="14.7" cy="6.6" r="2.3"/><circle cx="18.5" cy="10.5" r="2.2"/>',
     clock: '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2.2a7.8 7.8 0 1 1 0 15.6 7.8 7.8 0 0 1 0-15.6zM11 6.5v6.1l4.6 2.8 1.1-1.8-3.5-2.1V6.5z"/>',
+    soundOn: '<path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/>',
+    soundOff: '<path d="M4 9v6h4l5 4V5L8 9H4zm15.6 3 2.1-2.1-1.4-1.4-2.1 2.1-2.1-2.1-1.4 1.4 2.1 2.1-2.1 2.1 1.4 1.4 2.1-2.1 2.1 2.1 1.4-1.4z"/>',
     floor: '<path d="M3 20h5v-4h4v-4h4V8h5V5h-8v4H9v4H5v4H3z"/>'
   };
   function svg(name, cls) { return '<svg class="' + (cls || 'wg-ico') + '" viewBox="0 0 24 24" aria-hidden="true">' + ICON[name] + '</svg>'; }
@@ -101,6 +105,7 @@
   var HTML = '<div class="wg-vig"></div><div class="wg-bar"><div class="wg-pill wg-hearts" role="img"></div>' +
     '<div class="wg-pill wg-found" aria-label="Westies found"></div><div class="wg-pill wg-floor" aria-label="Floor"></div><div class="wg-pill wg-time" aria-label="Time">0:00</div>' +
     '<button class="wg-btn wg-pause" aria-label="Pause"><svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button></div>' +
+    '<button class="wg-btn wg-mus" aria-label="Music" aria-pressed="true"></button>' +
     '<div class="wg-pill wg-nav" aria-hidden="true"><span class="wg-arrow"></span><span class="wg-dist"></span></div>' +
     '<div class="wg-joy" aria-hidden="true"><div class="wg-knob"></div></div>' +
     '<div class="wg-toast" role="status" aria-live="polite"></div><div class="wg-flash"></div>' +
@@ -153,6 +158,157 @@
   function lerpAngle(a, b, k) { var d = (b - a) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return a + d * k; }
 
 
+  // ================= Music: original tunes in a Scottish folk style, synthesised with Web Audio =================
+  // Notes are written one token per step: a note ("D5", "F#4"), "-" holds the previous note, "." is a rest.
+  var MUSIC_KEY = 'westie-game-music';
+  var SEMI = { C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, 'G#': 8, A: 9, 'A#': 10, B: 11 };
+  function hz(n) { var m = /^([A-G]#?)(\d)$/.exec(n); return 440 * Math.pow(2, (SEMI[m[1]] + (+m[2] + 1) * 12 - 69) / 12); }
+  function seq(s) {
+    var out = [], last = null;
+    s.replace(/\|/g, ' ').trim().split(/\s+/).forEach(function (t) {
+      if (t === '-') { if (last) last.len++; out.push(null); }
+      else if (t === '.') { last = null; out.push(null); }
+      else { last = { f: hz(t), len: 1 }; out.push(last); }
+    });
+    return out;
+  }
+  var TRACKS = {
+    // 3/4, gentle: flute over a D drone.
+    menu: { bpm: 96, sub: 1, drone: ['D3', 'A3'], droneVol: 0.05, drum: 'X . . x . .', drumVol: 0.4, voices: [
+      { ins: 'flute', vol: 0.32, seq: seq('D5 - E5 | F#5 - A5 | B5 - A5 | F#5 - - | E5 - D5 | B4 - D5 | E5 - - | D5 - - | A4 - D5 | E5 - F#5 | A5 - B5 | A5 - - | F#5 - E5 | D5 - B4 | D5 - - | D5 - - |') }] },
+    // Jig in 6/8 (dotted crotchet = 120), D mixolydian, pipe tune over a bagpipe-like drone.
+    town: { bpm: 120, sub: 3, drone: ['D3', 'A3'], droneVol: 0.06, drum: 'X . x x . x', drumVol: 0.6, voices: [
+      { ins: 'pipe', vol: 0.22, seq: seq('D5 F#5 A5 | B5 A5 F#5 | G5 E5 C5 | E5 D5 C5 | D5 F#5 A5 | D6 B5 A5 | G5 E5 C5 | D5 - - | A5 B5 C6 | D6 C6 A5 | B5 G5 E5 | G5 A5 B5 | C6 B5 A5 | G5 E5 C5 | D5 E5 F#5 | D5 - - |') },
+      { ins: 'bass', vol: 0.28, seq: seq('D3 - - | A2 - - | C3 - - | C3 - - | D3 - - | D3 - - | C3 - - | D3 - - |') }] },
+    // Slow, misty: flute in A minor pentatonic, low drone, a soft heartbeat drum.
+    forest: { bpm: 72, sub: 2, drone: ['A2', 'E3'], droneVol: 0.05, drum: 'x . . . . . . . . . . . . . . .', drumVol: 0.35, voices: [
+      { ins: 'flute', vol: 0.3, seq: seq('E5 - - G5 | A5 - - - | C6 - B5 A5 | G5 - - - | E5 - D5 E5 | G5 - - - | A5 - - - | - - . . | A5 - - C6 | D6 - C6 A5 | G5 - E5 - | D5 - - - | E5 - G5 A5 | E5 - D5 C5 | A4 - - - | - - . . |') }] },
+    // Bouncy and plucky: G major pentatonic with a walking bass and off-beat taps.
+    tower: { bpm: 132, sub: 2, drone: null, drum: 'X . x . X . x x', drumVol: 0.45, voices: [
+      { ins: 'pluck', vol: 0.3, seq: seq('G4 . B4 D5 | E5 . D5 B4 | A4 . G4 A4 | B4 . . . | G4 . B4 D5 | G5 . E5 D5 | E5 D5 B4 A4 | G4 . . . | D5 . E5 G5 | A5 . G5 E5 | D5 . B4 D5 | E5 . . . | G5 . E5 D5 | B4 . A4 B4 | A4 G4 A4 B4 | G4 . . . |') },
+      { ins: 'bass', vol: 0.3, seq: seq('G2 . D3 . | C3 . G2 . | D3 . A2 . | G2 . D3 . | G2 . D3 . | C3 . G2 . | D3 . A2 . | G2 . G2 . |') }] },
+    // Driving A dorian reel feel; the game speeds it up floor by floor.
+    tower7: { bpm: 126, sub: 2, drone: ['A2', 'E3'], droneVol: 0.045, drum: 'X . x . X x x .', drumVol: 0.55, voices: [
+      { ins: 'pipe', vol: 0.2, seq: seq('A4 C5 E5 A5 | G5 E5 D5 E5 | C5 D5 E5 G5 | A5 - G5 E5 | A4 C5 E5 A5 | B5 A5 G5 E5 | D5 E5 G5 E5 | A5 - - . | E5 A5 A5 B5 | C6 B5 A5 G5 | E5 G5 D5 G5 | E5 D5 C5 B4 | A4 C5 E5 A5 | G5 E5 D5 B4 | C5 B4 G4 B4 | A4 - - . |') },
+      { ins: 'bass', vol: 0.3, seq: seq('A2 A2 A3 A2 | G2 G2 G3 G2 | C3 C3 C3 G2 | A2 A2 E3 A2 |') }] }
+  };
+  var STINGS = {
+    win: [['pipe', 'D5', 0, 0.12], ['pipe', 'F#5', 0.12, 0.12], ['pipe', 'A5', 0.24, 0.12], ['pipe', 'D6', 0.36, 0.9], ['flute', 'A5', 0.36, 0.9], ['bass', 'D3', 0.36, 0.9]],
+    lose: [['flute', 'A4', 0, 0.35], ['flute', 'F4', 0.38, 0.35], ['flute', 'D4', 0.76, 1.1], ['bass', 'D2', 0.76, 1.1]]
+  };
+
+  function makeMusic() {
+    var AC = window.AudioContext || window.webkitAudioContext, ctx = null, master, bus, noise, drone = [], cur = null, curName = null, pending = null;
+    var step = 0, nextT = 0, timer = 0, notes = 0, extra = 0, on = true, closed = false;
+    try { on = localStorage.getItem(MUSIC_KEY) !== 'off'; } catch (e) { /* storage blocked: default on */ }
+
+    function voice(ins, f, t, dur, vol) {
+      notes++;
+      var o = ctx.createOscillator(), g = ctx.createGain(), out = g, end;
+      o.frequency.value = f;
+      if (ins === 'pipe') { // reedy chanter: square through a lowpass, quick attack
+        o.type = 'square'; var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2200; o.connect(lp); lp.connect(g);
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.012); g.gain.setValueAtTime(vol, t + dur * 0.85); g.gain.linearRampToValueAtTime(0, t + dur + 0.04); end = t + dur + 0.06;
+      } else if (ins === 'flute') { // breathy sine with a slow swell
+        o.type = 'sine'; o.connect(g);
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.08); g.gain.setValueAtTime(vol * 0.85, t + dur * 0.8); g.gain.linearRampToValueAtTime(0, t + dur + 0.18); end = t + dur + 0.2;
+      } else { // pluck and bass: triangle with a fast decay
+        o.type = 'triangle'; o.connect(g); var dec = ins === 'bass' ? Math.min(dur, 0.6) + 0.15 : 0.35;
+        g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dec); end = t + dec + 0.02;
+      }
+      out.connect(bus); o.start(t); o.stop(end);
+    }
+    function drum(t, strong, vol) { // bodhran: pitched-down thump, plus a skin tap on light hits
+      notes++;
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(strong ? 140 : 180, t); o.frequency.exponentialRampToValueAtTime(55, t + 0.12);
+      g.gain.setValueAtTime(vol * (strong ? 0.9 : 0.45), t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+      o.connect(g); g.connect(bus); o.start(t); o.stop(t + 0.27);
+      if (!strong) {
+        var n = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), ng = ctx.createGain();
+        n.buffer = noise; bp.type = 'bandpass'; bp.frequency.value = 1800; ng.gain.setValueAtTime(vol * 0.18, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+        n.connect(bp); bp.connect(ng); ng.connect(bus); n.start(t); n.stop(t + 0.07);
+      }
+    }
+    function stepDur() { return 60 / (cur.bpm + extra) / cur.sub; }
+    function schedule(n, t) {
+      var sd = stepDur();
+      cur.voices.forEach(function (v) { var e = v.seq[n % v.seq.length]; if (e) voice(v.ins, e.f, t, e.len * sd * 0.95, v.vol); });
+      var d = cur.drum.split(' '), k = d[n % d.length];
+      if (k !== '.') drum(t, k === 'X', cur.drumVol);
+    }
+    function tick() { // lookahead scheduler: queue anything due in the next 150 ms
+      clearTimeout(timer); timer = setTimeout(tick, 25);
+      if (!ctx || !cur || ctx.state !== 'running') return;
+      if (nextT < ctx.currentTime) nextT = ctx.currentTime + 0.02;
+      while (nextT < ctx.currentTime + 0.15) { schedule(step, nextT); nextT += stepDur(); step++; }
+    }
+    function stopDrone() {
+      drone.forEach(function (d) { try { d.g.gain.setTargetAtTime(0, ctx.currentTime, 0.15); d.o.stop(ctx.currentTime + 0.8); } catch (e) { /* already stopped */ } });
+      drone = [];
+    }
+    function startDrone(list, vol) {
+      if (!list) return;
+      list.forEach(function (n, i) {
+        var o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
+        o.type = 'sawtooth'; o.frequency.value = hz(n); o.detune.value = i ? 3 : -3; lp.type = 'lowpass'; lp.frequency.value = 520;
+        g.gain.setValueAtTime(0, ctx.currentTime); g.gain.linearRampToValueAtTime(vol, ctx.currentTime + 1.2);
+        o.connect(lp); lp.connect(g); g.connect(bus); o.start(); drone.push({ o: o, g: g });
+      });
+    }
+    var api = {
+      // Must be called from a user gesture (tap/click/key): iOS only lets audio start that way.
+      unlock: function () {
+        if (closed || !AC) return;
+        if (!ctx) {
+          try { ctx = new AC(); } catch (e) { return; }
+          var comp = ctx.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 3;
+          master = ctx.createGain(); master.gain.value = on ? 0.22 : 0; bus = ctx.createGain();
+          bus.connect(master); master.connect(comp); comp.connect(ctx.destination);
+          noise = ctx.createBuffer(1, ctx.sampleRate * 0.1, ctx.sampleRate);
+          var ch = noise.getChannelData(0); for (var i = 0; i < ch.length; i++) ch[i] = Math.random() * 2 - 1;
+          var s = ctx.createBufferSource(); s.buffer = ctx.createBuffer(1, 1, 22050); s.connect(ctx.destination); s.start(0); // iOS unlock blip
+        }
+        if (on && ctx.state === 'suspended') ctx.resume();
+        if (pending) { var p = pending; pending = null; api.play(p); }
+      },
+      play: function (name) {
+        if (!ctx) { pending = name; return; }
+        if (name === curName && cur) { api.resume(); return; }
+        stopDrone(); cur = TRACKS[name]; curName = name; step = 0; nextT = ctx.currentTime + 0.1;
+        startDrone(cur.drone, cur.droneVol);
+        api.resume();
+      },
+      sting: function (kind) {
+        if (!ctx) return;
+        stopDrone(); cur = null; curName = null;
+        if (!on) return;
+        if (ctx.state === 'suspended') ctx.resume();
+        var t = ctx.currentTime + 0.05;
+        STINGS[kind].forEach(function (n) { voice(n[0], hz(n[1]), t + n[2], n[3], n[0] === 'bass' ? 0.3 : 0.25); });
+        if (kind === 'win') [0, 0.12, 0.24, 0.36].forEach(function (d) { drum(t + d, d === 0.36, 0.5); });
+      },
+      suspend: function () { clearTimeout(timer); if (ctx && ctx.state === 'running') ctx.suspend(); },
+      resume: function () {
+        if (!ctx || !on || closed) return;
+        var go = function () { nextT = Math.max(nextT, ctx.currentTime + 0.05); tick(); };
+        if (ctx.state === 'suspended') ctx.resume().then(go, function () {}); else go();
+      },
+      duck: function () { if (!ctx) return; var t = ctx.currentTime; bus.gain.cancelScheduledValues(t); bus.gain.setTargetAtTime(0.3, t, 0.05); bus.gain.setTargetAtTime(1, t + 0.7, 0.25); },
+      tempo: function (add) { extra = add; },
+      isOn: function () { return on; },
+      setOn: function (v) {
+        on = v; try { localStorage.setItem(MUSIC_KEY, v ? 'on' : 'off'); } catch (e) { /* storage blocked */ }
+        if (!ctx) return;
+        master.gain.setTargetAtTime(v ? 0.22 : 0, ctx.currentTime, 0.05);
+        if (!v) setTimeout(function () { if (!on) api.suspend(); }, 200);
+      },
+      dispose: function () { closed = true; clearTimeout(timer); if (ctx && ctx.state !== 'closed') ctx.close(); },
+      stats: function () { return { notes: notes, state: ctx ? ctx.state : 'none', track: curName }; }
+    };
+    return api;
+  }
+
   function disposeTree(obj) {
     obj.traverse(function (o) {
       if (o.geometry) o.geometry.dispose();
@@ -166,6 +322,17 @@
     var root = document.createElement('div'); root.className = 'wg-root'; root.innerHTML = HTML;
     container.appendChild(root);
     var $ = function (s) { return root.querySelector(s); };
+    var music = makeMusic(), musBtn = $('.wg-mus');
+    function musIcon() { var o = music.isOn(); musBtn.innerHTML = svg(o ? 'soundOn' : 'soundOff', ''); musBtn.setAttribute('aria-pressed', String(o)); musBtn.setAttribute('aria-label', o ? 'Music on' : 'Music off'); }
+    function toggleMusic() {
+      music.unlock(); music.setOn(!music.isOn()); musIcon();
+      if (music.isOn() && state !== 'pause') music.resume();
+      [].forEach.call(root.querySelectorAll('[data-act="music"]'), function (b) { b.textContent = 'Music: ' + (music.isOn() ? 'On' : 'Off'); });
+    }
+    musIcon(); musBtn.onclick = toggleMusic;
+    // Audio may only start inside a user gesture (iOS): unlock on the first tap or key.
+    var unlock = function () { music.unlock(); };
+    root.addEventListener('pointerdown', unlock, true); window.addEventListener('keydown', unlock, true);
     if ((window.matchMedia && matchMedia('(pointer: coarse)').matches) || 'ontouchstart' in window) root.classList.add('wg-touch');
 
     var renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -1206,14 +1373,15 @@
         html = '<p class="wg-kicker">Westies of Ayr</p><h2>Westie Hunt</h2><p>Find every painted Westie as fast as you can. Follow the gold arrow.</p>' +
           '<div class="wg-levels">' + levelCard('town', 'Town', '10 Westies · cars, gulls') + levelCard('forest', 'Forest Maze', '8 Westies · foxes, badgers') +
           levelCard('tower', 'The Old Mill', '12 Westies · 4 floors, ladders') + levelCard('tower7', 'The Tower', 'All ' + D.length + ' Westies · 7 floors') + '</div>' +
-          '<p style="font-size:.85rem;margin-top:12px">Move with WASD / arrow keys, or the joystick on a phone.</p>';
+          '<p style="font-size:.85rem;margin-top:12px">Move with WASD / arrow keys, or the joystick on a phone.</p><button class="wg-go wg-alt" data-act="music">Music: ' + (music.isOn() ? 'On' : 'Off') + '</button>';
+        music.play('menu');
       } else if (kind === 'pause') {
         var grid = '';
         if (L.numbered) {
           var got = {}; L.statues.forEach(function (s) { if (s.found) got[s.id] = 1; });
           grid = '<div class="wg-grid" aria-label="Trail numbers found">' + D.map(function (d, i) { return '<span' + (got[i] ? ' class="wg-got" title="' + d.name.replace(/"/g, '') + '"' : '') + '>' + (i + 1) + '</span>'; }).join('') + '</div>';
         }
-        html = '<p class="wg-kicker">' + L.title + '</p><h2>Paused</h2><p>' + found + ' of ' + n + ' found in ' + fmt(time) + (L.floors ? ' · Floor ' + (L.floor + 1) + '/' + L.floors.length : '') + '</p>' + grid + '<button class="wg-go" data-act="resume">Resume</button><button class="wg-go wg-alt" data-act="restart">Restart</button>' + menu;
+        html = '<p class="wg-kicker">' + L.title + '</p><h2>Paused</h2><p>' + found + ' of ' + n + ' found in ' + fmt(time) + (L.floors ? ' · Floor ' + (L.floor + 1) + '/' + L.floors.length : '') + '</p>' + grid + '<button class="wg-go" data-act="resume">Resume</button><button class="wg-go wg-alt" data-act="restart">Restart</button><button class="wg-go wg-alt" data-act="music">Music: ' + (music.isOn() ? 'On' : 'Off') + '</button>' + menu;
       } else if (kind === 'win') {
         var st = starsFor(L.key, Math.floor(time)), stars = '', i;
         for (i = 0; i < 3; i++) stars += '<span' + (i < st ? ' class="wg-got"' : '') + ' style="animation-delay:' + (0.15 + i * 0.18) + 's">★</span>';
@@ -1229,7 +1397,8 @@
       [].forEach.call(card.querySelectorAll('[data-act]'), function (btn) {
         btn.onclick = function () {
           var act = btn.getAttribute('data-act');
-          if (act === 'resume') resume();
+          if (act === 'music') toggleMusic();
+          else if (act === 'resume') resume();
           else if (act === 'menu') { state = 'start'; showScreen('start'); }
           else begin(act === 'restart' ? L.key : act);
         };
@@ -1239,12 +1408,14 @@
     function begin(key) {
       if (key === 'forest' || key !== L.key) setLevel(key); // the forest is a fresh maze every run
       reset(); state = 'play'; showScreen(null); draw(); run();
+      music.tempo(0); music.play(key);
     }
     function end(kind) {
       state = kind; stop(); keys = {};
       if (kind === 'win') {
         try { var b = best(L.key); if (b === null || time < b) localStorage.setItem(KEYS[L.key], String(Math.floor(time))); } catch (e) { /* storage blocked */ }
       }
+      music.sting(kind === 'win' ? 'win' : 'lose');
       draw(); showScreen(kind);
     }
     function hurt(dx, dz) {
@@ -1255,7 +1426,7 @@
     }
     function collect(st) {
       st.found = true; found++; st.beam.visible = false; st.skin.emissiveIntensity = 0; st.pop = 1;
-      burst(st.x, (L.y || 0) + 1.6, st.z);
+      burst(st.x, (L.y || 0) + 1.6, st.z); music.duck();
       hud();
       var what = L.numbered ? 'No. ' + (st.id + 1) + ' — ' + st.name : 'Found: ' + st.name + '!';
       if (found < L.statues.length) toast(what);
@@ -1325,6 +1496,7 @@
       if (inv > 0) { inv -= dt; player.visible = inv <= 0 || Math.floor(inv * 12) % 2 === 0; }
 
       L.tick(dt);
+      if (L.key === 'tower7') music.tempo(L.floor * 5); // the Tower speeds up as you climb
       if (state !== 'play') return;
 
       var near = null, nd = 1e9, here = L.floors ? L.floor : undefined;
@@ -1372,9 +1544,9 @@
 
     function pause() {
       if (state !== 'play') return;
-      state = 'pause'; stop(); keys = {}; joyEnd({ pointerId: jid }); draw(); showScreen('pause');
+      state = 'pause'; stop(); keys = {}; joyEnd({ pointerId: jid }); music.suspend(); draw(); showScreen('pause');
     }
-    function resume() { if (state === 'pause') { state = 'play'; showScreen(null); run(); } }
+    function resume() { if (state === 'pause') { state = 'play'; showScreen(null); run(); music.resume(); } }
 
     var KEYMAP = { ArrowUp: 'u', w: 'u', W: 'u', ArrowDown: 'd', s: 'd', S: 'd', ArrowLeft: 'l', a: 'l', A: 'l', ArrowRight: 'r', d: 'r', D: 'r' };
     function onKey(e) {
@@ -1382,7 +1554,7 @@
       else if (e.type === 'keydown' && (e.key === 'p' || e.key === 'P' || e.key === 'Escape')) { if (state === 'play') pause(); else if (state === 'pause' && e.key !== 'Escape') resume(); }
     }
     function onBlur() { keys = {}; }
-    function onVis() { if (document.hidden) pause(); }
+    function onVis() { if (document.hidden) { pause(); music.suspend(); } else if (state !== 'pause' && root.clientWidth) music.resume(); }
     window.addEventListener('keydown', onKey); window.addEventListener('keyup', onKey); window.addEventListener('blur', onBlur);
     document.addEventListener('visibilitychange', onVis);
     $('.wg-pause').onclick = pause;
@@ -1400,21 +1572,25 @@
 
     function resize() {
       var w = root.clientWidth, h = root.clientHeight;
-      if (!w || !h) { pause(); return; } // tab hidden (display:none)
+      if (!w || !h) { pause(); music.suspend(); return; } // tab hidden (display:none)
       renderer.setSize(w, h); cam.aspect = w / h; cam.fov = w < h ? 62 : 50; cam.updateProjectionMatrix();
       camScale = w < h ? 1.6 : 1.3; place(1, 0); if (!raf) draw();
+      if (state !== 'pause' && !document.hidden) music.resume();
     }
     var ro = window.ResizeObserver ? new ResizeObserver(resize) : null;
     if (ro) ro.observe(root); else window.addEventListener('resize', resize);
 
     setLevel('town'); reset(); resize(); showScreen('start');
     // Test-only hook (game-test.html sets the flag first); not part of the API.
-    if (window.WESTIE_GAME_DEBUG) window.WESTIE_GAME_DEBUG = { level: function () { return L; }, warp: function (x, z) { px = x; pz = z; place(1, 0); }, collect: function (n) { L.statues.slice(0, n).forEach(function (s) { if (!s.found) collect(s); }); }, floor: function (n) { if (L.setFloor) { L.setFloor(n); hud(); } } };
+    if (window.WESTIE_GAME_DEBUG) window.WESTIE_GAME_DEBUG = { level: function () { return L; }, warp: function (x, z) { px = x; pz = z; place(1, 0); }, collect: function (n) { L.statues.slice(0, n).forEach(function (s) { if (!s.found) collect(s); }); }, floor: function (n) { if (L.setFloor) { L.setFloor(n); hud(); } }, music: music };
 
     return {
-      pause: pause, resume: resume,
+      // The host may pause on the menu too (tab switch): always silence; resume() restarts menu music if not mid-game.
+      pause: function () { pause(); music.suspend(); },
+      resume: function () { resume(); if (state !== 'pause') music.resume(); },
       dispose: function () {
-        stop(); state = 'disposed';
+        stop(); state = 'disposed'; music.dispose();
+        root.removeEventListener('pointerdown', unlock, true); window.removeEventListener('keydown', unlock, true);
         if (ro) ro.disconnect(); else window.removeEventListener('resize', resize);
         window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKey); window.removeEventListener('blur', onBlur);
         document.removeEventListener('visibilitychange', onVis);
