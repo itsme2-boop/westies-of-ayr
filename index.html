@@ -174,6 +174,13 @@ nav .collect.on{color:var(--ink)}
 #splash p{opacity:.85;max-width:320px;margin:8px 0 28px}
 #splash .steps{text-align:left;max-width:320px;margin-bottom:28px}
 .leaflet-control-attribution{font-size:10px}
+/* phone sideways on the Game tab: game goes full screen (header/nav hidden), ✕ returns to the map */
+#game-exit{display:none;position:fixed;z-index:600;right:calc(12px + env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));width:44px;height:44px;border-radius:50%;border:0;background:rgba(16,22,36,.7);color:#fff;font-size:1.2rem;cursor:pointer;place-items:center}
+@media (orientation:landscape) and (max-height:560px){
+  body[data-tab=game] header,body[data-tab=game] nav{display:none}
+  body[data-tab=game] main{top:0;bottom:0;left:env(safe-area-inset-left);right:env(safe-area-inset-right)}
+  body[data-tab=game] #game-exit{display:grid}
+}
 </style>
 </head>
 <body>
@@ -234,6 +241,8 @@ nav .collect.on{color:var(--ink)}
   <button data-v="me"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z"/></svg>Progress</button>
   <button data-v="game"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11.5" r="1"/><circle cx="18" cy="13.5" r="1"/></svg>Game</button>
 </nav>
+
+<button id="game-exit" aria-label="Leave game">✕</button>
 
 <div id="sheet" role="dialog" aria-modal="true" aria-labelledby="s-title">
   <div class="hero">
@@ -314,7 +323,7 @@ else $('go').onclick = () => { store('westie-seen', true); $('splash').classList
 // ---------- tabs + back button history ----------
 let tab = 'map', game = null;
 function show(v) {
-  tab = v;
+  tab = v; document.body.dataset.tab = v;
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x.dataset.v === v));
   document.querySelectorAll('.view').forEach(el => el.classList.toggle('on', el.id === 'v-' + v));
   if (v === 'map') map.invalidateSize();
@@ -328,6 +337,7 @@ document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
   history.pushState({ v: b.dataset.v }, '');
   show(b.dataset.v);
 });
+$('game-exit').onclick = () => { if (game) game.pause(); document.querySelector('nav [data-v=map]').click(); };
 addEventListener('popstate', e => {
   const s = e.state || { v: 'map' };
   sheet.classList.toggle('on', s.s != null);
