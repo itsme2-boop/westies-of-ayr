@@ -5,6 +5,8 @@
   'use strict';
   var STATUES = 10, FOREST_STATUES = 8, LIVES = 3, SPEED = 7, PR = 0.6, BEST_KEY = 'westie-game-best';
   var START = [-46.5, 0];
+  // Wee Clank's Leap (the only level with jumping): gravity m/s², jump speeds, hover fall speed and how long the booster fuel lasts (s).
+  var GRAV = 24, JUMP_V = 9, JUMP_V2 = 8, HOVER_V = -1.1, HOVER_T = 1.3;
 
   function rng(seed) {
     return function () {
@@ -55,6 +57,10 @@
     '.wg-hearts{gap:1px;padding:0 10px}.wg-hearts svg{width:24px;height:24px;fill:#ec4058;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2));transition:transform .3s}.wg-hearts svg.wg-lost{fill:#9aa1b0;opacity:.45;transform:scale(.85)}',
     '.wg-found .wg-ico{fill:#e09b00}.wg-time{margin-left:auto}',
     '.wg-floor{display:none}.wg-tower .wg-floor{display:flex}',
+    // Wee Clank's Leap only: booster fuel bar under the hearts, and a big jump button for thumbs (above the host app's Back button).
+    '.wg-fuel{display:none;position:absolute;top:62px;left:10px;width:96px;height:14px;border-radius:99px;background:var(--wg-glass);border:1px solid var(--wg-edge);box-shadow:0 2px 8px rgba(0,0,0,.18);overflow:hidden;pointer-events:none}.wg-robot .wg-fuel{display:block}',
+    '.wg-fuel i{position:absolute;inset:2px;border-radius:99px;background:linear-gradient(90deg,#ff7a1a,#ffd23f);transform-origin:left;transition:transform .08s}',
+    '.wg-btn.wg-jump{display:none;position:absolute;right:18px;bottom:calc(76px + env(safe-area-inset-bottom));width:88px;height:88px;font-size:15px;font-weight:800;touch-action:none}.wg-robot.wg-touch .wg-btn.wg-jump{display:grid}.wg-jump svg{width:34px;height:34px}.wg-btn.wg-jump.wg-down{transform:scale(.92);background:#ffd25e;color:#1b2440}',
     '.wg-btn{pointer-events:auto;min-width:44px;height:44px;border:1px solid var(--wg-edge);border-radius:999px;background:var(--wg-glass);color:var(--wg-ink);font:inherit;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.16);display:grid;place-items:center;padding:0}',
     '.wg-btn svg{width:20px;height:20px;fill:currentColor}',
     '.wg-mus{position:absolute;top:60px;right:8px}.wg-mus svg{width:22px;height:22px}',
@@ -110,6 +116,7 @@
     harbour: '<svg viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" fill="#0f1b33"/><path d="M38 10l4 24h-8z" fill="#e8e8e8"/><rect x="36" y="7" width="4" height="4" fill="#ffd166"/><path d="M40 9L52 4v10z" fill="#ffd166" opacity=".5"/><rect y="34" width="52" height="18" fill="#1d3557"/><path d="M6 34h18l-3 5H9z" fill="#c1121f"/><rect x="13" y="26" width="2" height="8" fill="#ddd"/><path d="M0 44h52v8H0z" fill="#59606b"/><path d="M26 44l10-6 6 6z" fill="#ffd166" opacity=".35"/></svg>',
     winterpark: '<svg viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" fill="#9cc3e6"/><path d="M0 18l6-12 6 12zM40 20l6-13 6 13z" fill="#2f5d3a"/><path d="M3.5 11l2.5-5 2.5 5zM43.5 13l2.5-6 2.5 6z" fill="#fff"/><path d="M0 36q26-6 52 0v16H0z" fill="#f1f5fa"/><ellipse cx="38" cy="45" rx="10" ry="3" fill="#cde9f7"/><circle cx="16" cy="34" r="7" fill="#fff"/><circle cx="16" cy="24" r="5" fill="#fff"/><circle cx="16" cy="16" r="3.6" fill="#fff"/><rect x="12" y="8" width="8" height="5" fill="#1d1d1f"/><rect x="10.5" y="12.5" width="11" height="1.5" fill="#1d1d1f"/><path d="M19 16l5 1-5 1z" fill="#f77f00"/><rect x="11.5" y="19.5" width="9" height="2.5" fill="#c8102e"/><path d="M28 36h10l2-3h2l-1 4v5h-2v-3h-8v3h-2v-5l-2-2z" fill="#7b4a26"/><rect x="29" y="35" width="8" height="3" fill="#e63946"/><g fill="#fff"><circle cx="30" cy="8" r="1"/><circle cx="24" cy="4" r=".8"/><circle cx="34" cy="16" r=".8"/><circle cx="8" cy="26" r=".8"/><circle cx="45" cy="26" r="1"/></g></svg>',
     tower7: '<svg viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" fill="#a9d3f5"/><rect x="16" y="8" width="20" height="44" fill="#d6c4a4"/><g fill="#34495a"><rect x="20" y="13" width="4" height="4"/><rect x="28" y="13" width="4" height="4"/><rect x="20" y="20" width="4" height="4"/><rect x="28" y="20" width="4" height="4"/><rect x="20" y="27" width="4" height="4"/><rect x="28" y="27" width="4" height="4"/><rect x="20" y="34" width="4" height="4"/><rect x="28" y="34" width="4" height="4"/></g><rect x="14" y="5" width="24" height="4" fill="#4f9443"/><circle cx="19" cy="4" r="3" fill="#3f8a3a"/><circle cx="32" cy="4" r="3" fill="#e86a8a"/><rect x="23" y="42" width="6" height="10" fill="#7a4a2a"/></svg>',
+    robot: '<svg viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" fill="#8fd0f2"/><path d="M0 40h52v12H0z" fill="#2d83bf"/><path d="M0 41q6-2 13 0t13 0 13 0 13 0" stroke="#fff" stroke-width="1.2" fill="none" opacity=".7"/><rect x="4" y="36" width="14" height="16" fill="#c9a77c"/><rect x="3" y="34" width="16" height="3" fill="#e63946"/><rect x="36" y="30" width="13" height="22" fill="#c9a77c"/><rect x="35" y="28" width="15" height="3" fill="#ffd166"/><path d="M22 32l2 8 2-8z" fill="#ffb02e"/><rect x="20" y="18" width="12" height="12" rx="5" fill="#f28c28"/><rect x="20" y="23" width="12" height="2" fill="#c8102e"/><ellipse cx="26" cy="13" rx="7" ry="6" fill="#8fe3cf"/><ellipse cx="27" cy="13.5" rx="4.6" ry="3.8" fill="#fff4dc"/><circle cx="25.3" cy="12.8" r="1" fill="#3b2416"/><circle cx="28.7" cy="12.8" r="1" fill="#3b2416"/><path d="M25.5 15q1.5 1.3 3 0" stroke="#3b2416" stroke-width=".8" fill="none"/><path d="M26 7V4" stroke="#9aa4ad" stroke-width="1"/><circle cx="26" cy="3.5" r="1.8" fill="#ffd23f"/><circle cx="40" cy="24" r="2.2" fill="#fff"/><circle cx="8" cy="30" r="2.2" fill="#fff"/></svg>',
     tower: '<svg viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" fill="#f6c690"/><rect x="12" y="10" width="28" height="38" fill="#a4553a"/><path d="M10 10h32l-4-6H14z" fill="#5b3a2c"/><g fill="#ffe7a8"><rect x="16" y="14" width="5" height="6"/><rect x="31" y="14" width="5" height="6"/><rect x="16" y="25" width="5" height="6"/><rect x="31" y="25" width="5" height="6"/></g><rect x="23" y="36" width="6" height="12" fill="#3b2a20"/><g stroke="#6b4a2f" stroke-width="1.6"><path d="M43 48V20M48 48V20M43 26h5M43 32h5M43 38h5M43 44h5"/></g></svg>'
   };
 
@@ -119,6 +126,7 @@
     '<button class="wg-btn wg-mus" aria-label="Music" aria-pressed="true"></button>' +
     '<div class="wg-pill wg-nav" aria-hidden="true"><span class="wg-arrow"></span><span class="wg-dist"></span></div>' +
     '<div class="wg-joy" aria-hidden="true"><div class="wg-knob"></div></div><div class="wg-hint" aria-hidden="true"><i></i></div>' +
+    '<div class="wg-fuel" aria-hidden="true"><i></i></div><button class="wg-btn wg-jump" aria-label="Jump"><svg viewBox="0 0 24 24"><path d="M12 3l8 9h-5v8H9v-8H4z"/></svg></button>' +
     '<div class="wg-toast" role="status" aria-live="polite"></div><div class="wg-flash"></div>' +
     '<div class="wg-screen" role="dialog" aria-modal="true"><div class="wg-card"></div></div>';
 
@@ -223,6 +231,10 @@
       { ins: 'flute', vol: 0.28, seq: seq('C5 F5 A5 | G5 - F5 | E5 G5 C6 | A5 - - | F5 A5 C6 | D6 C6 A5 | G5 A5 G5 | F5 - - | A5 C6 D6 | C6 A5 F5 | G5 - E5 | C5 - - | F5 G5 A5 | C6 A5 F5 | E5 G5 E5 | F5 - - |') },
       { ins: 'pluck', vol: 0.12, seq: seq('F6 . . | C6 . . | E6 . . | F6 . . | A6 . . | F6 . . | E6 . . | F6 . . |') },
       { ins: 'bass', vol: 0.26, seq: seq('F2 - - | F2 - - | C3 - - | F2 - - | F2 - - | D3 - - | C3 - - | F2 - - |') }] },
+    // Bouncy C major for Wee Clank's Leap: plucked tune, hopping bass.
+    robot: { bpm: 140, sub: 2, drone: null, drum: 'X . x . X . x x', drumVol: 0.45, voices: [
+      { ins: 'pluck', vol: 0.3, seq: seq('C5 . E5 G5 | C6 . G5 E5 | F5 . A5 C6 | G5 . . . | E5 . G5 C6 | D6 . C6 A5 | G5 E5 D5 E5 | C5 . . . |') },
+      { ins: 'bass', vol: 0.3, seq: seq('C3 . G2 . | F2 . C3 . | G2 . D3 . | C3 . G2 . |') }] },
     // Driving A dorian reel feel; the game speeds it up floor by floor.
     tower7: { bpm: 126, sub: 2, drone: ['A2', 'E3'], droneVol: 0.045, drum: 'X . x . X x x .', drumVol: 0.55, voices: [
       { ins: 'pipe', vol: 0.2, seq: seq('A4 C5 E5 A5 | G5 E5 D5 E5 | C5 D5 E5 G5 | A5 - G5 E5 | A4 C5 E5 A5 | B5 A5 G5 E5 | D5 E5 G5 E5 | A5 - - . | E5 A5 A5 B5 | C6 B5 A5 G5 | E5 G5 D5 G5 | E5 D5 C5 B4 | A4 C5 E5 A5 | G5 E5 D5 B4 | C5 B4 G4 B4 | A4 - - . |') },
@@ -257,6 +269,9 @@
       bark2: function (t) { SFX.bark(t); SFX.bark(t + 0.2); },
       yelp: function (t) { tone('triangle', 900, 1500, t, 0.06, 0.28); tone('triangle', 1500, 520, t + 0.06, 0.2, 0.25); },
       clunk: function (t) { tone('sine', 130, 65, t, 0.18, 0.5); hiss(t, 0.04, 0.2, 2500); },
+      hop: function (t) { tone('square', 330, 660, t, 0.12, 0.12, 1800); },
+      boost: function (t) { tone('sawtooth', 110, 260, t, 0.3, 0.14, 700); hiss(t, 0.1, 0.2, 900); },
+      splash: function (t) { hiss(t, 0.1, 0.35, 700); tone('sine', 420, 120, t, 0.3, 0.2); },
       gate: function (t) { tone('sawtooth', 75, 115, t, 0.55, 0.12, 600); tone('sawtooth', 110, 80, t + 0.5, 0.4, 0.1, 600); SFX.chime(t + 0.8); }
     };
 
@@ -442,6 +457,8 @@
     var shownAng = 99, navShown = true, shake = 0, climb = null, ladderLock = false, floorEl = $('.wg-floor');
     var px = START[0], pz = START[1], vx = 0, vz = 0, kx = 0, kz = 0, walk = 0, keys = {}, jx = 0, jz = 0, jid = null;
     var L = null, levels = {};
+    // Height and jumping (only Wee Clank's Leap moves py; it stays 0 elsewhere). safe = last platform stood on, for respawns.
+    var py = 0, vy = 0, jumps = 0, fuel = 1, airT = 0, grounded = true, jumpPress = false, hovering = false, boostT = 0, safe = null, shownFuel = -1;
 
     // ---- Shared pieces: vertex-colour material and painted Westie statues on plinths.
     var vmat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
@@ -1907,6 +1924,111 @@
       };
     }
 
+    // ================= Level 11: Wee Clank's Leap =================
+    // A jump-and-run course of stepping stones over the Firth of Clyde off Ayr beach, ending at a sandstone tower. You play Wee Clank,
+    // a small tin robot (orange barrel body, mint dome head, cream face with button eyes, red band, yellow antenna bulb, back booster).
+    // Platforms are [x, z, width, depth, top]. Falling in the sea costs a heart and puts Clank back on the last platform stood on.
+    // Second jump in the air fires the booster; holding jump after that hovers (slow fall) until the fuel bar runs out. Gulls patrol gaps.
+    function buildRobot() {
+      var grp = new THREE.Group(), k, SEA = -0.8;
+      var PL = [[0, 5, 16, 14, 0], [0, -5, 4, 4, 0.6], [3, -11, 4, 4, 1.2], [-1, -18, 4, 4, 1.8], [-1, -26, 6, 6, 1], [5, -33, 3, 3, 2.4], [-2, -42, 5, 5, 1],
+        [-2, -58, 5, 5, 1], [12, -50, 4, 4, 1.5], [4, -66, 4, 4, 2], [10, -73, 4, 4, 3], [4, -82, 6, 4, 3], [-4, -90, 4, 4, 2], [-4, -99, 4, 4, 1], [0, -111, 5, 10, 1.5]];
+      var RECT = PL.map(function (p) { return [p[0] - p[2] / 2, p[1] - p[3] / 2, p[0] + p[2] / 2, p[1] + p[3] / 2]; });
+      var HOVER_PL = PL[6], FIN = PL[PL.length - 1];
+      var boxes = [[-400, -400, -26, 400], [26, -400, 400, 400], [-400, 13, 400, 400], [-400, -400, 400, -116]]; // world edge
+      var gateBox = [-2.6, -108.8, 2.6, -108.2]; boxes.push(gateBox);
+      // highest platform under (x, z) whose top is at or below h (0.25 m of edge grace), or null over open sea
+      function groundAt(x, z, h) {
+        var best = null;
+        for (var i = 0; i < PL.length; i++) { var p = PL[i]; if (Math.abs(x - p[0]) <= p[2] / 2 + 0.25 && Math.abs(z - p[1]) <= p[3] / 2 + 0.25 && p[4] <= h && (!best || p[4] > best[4])) best = p; }
+        return best;
+      }
+      // platforms taller than a small step block sideways movement
+      function walls(h) { var w = boxes.slice(); for (var i = 0; i < PL.length; i++) if (PL[i][4] > h + 0.4) w.push(RECT[i]); return w; }
+      console.assert(groundAt(0, 5, 0.4) === PL[0] && groundAt(0, -50, 9) === null && groundAt(-4, -99, 0.5) === null && walls(0).length === boxes.length + PL.length - 1, 'robot level: groundAt / walls');
+
+      var sea = new THREE.Mesh(new THREE.PlaneGeometry(400, 400).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: col('#2d83bf'), roughness: 0.25, metalness: 0.15 }));
+      sea.position.set(0, SEA, -60); sea.receiveShadow = true; grp.add(sea);
+      // Stone stepping stones with beach-hut coloured tops; the first is the sandy beach.
+      var HUT = ['#e63946', '#f4a261', '#2a9d8f', '#ffd166', '#118ab2', '#ef476f'], unit = merge([P(box(1, 1, 1), '#ffffff', 0, 0.5, 0)]);
+      var cols = inst(unit, vmat, PL.map(function (p, i) { return { x: p[0], y: SEA - 1, z: p[1], sx: p[2], sy: p[4] - SEA + 0.75, sz: p[3], c: i ? '#c9a77c' : '#d9bd85' }; }));
+      var caps = inst(unit, vmat, PL.map(function (p, i) { return { x: p[0], y: p[4] - 0.25, z: p[1], sx: p[2] + 0.12, sy: 0.25, sz: p[3] + 0.12, c: i ? HUT[i % HUT.length] : '#e8d2a0' }; }));
+      cols.castShadow = caps.castShadow = true; grp.add(cols, caps);
+      // Beach huts along the back of the beach.
+      grp.add(inst(merge([P(box(1.6, 1.8, 1.6), '#ffffff', 0, 0.9, 0), P(new THREE.ConeGeometry(1.3, 0.8, 4), '#f4f1ea', 0, 2.2, 0, [0, Math.PI / 4, 0]), P(box(0.7, 1.2, 0.05), '#5b3a22', 0, 0.6, -0.81)]), vmat,
+        [-6, -3, 0, 3, 6].map(function (x, i) { return { x: x, z: 10.5, c: HUT[i] }; })));
+      // Finish: sandstone tower with a gold flag, and an arch whose glowing gate opens once every Westie is collected.
+      grp.add(new THREE.Mesh(merge([P(box(3.4, 9, 3.4), '#d6b98c', 0, FIN[4] + 4.5, -113.5), P(box(3.8, 0.5, 3.8), '#c4a575', 0, FIN[4] + 9.2, -113.5),
+        P(box(0.7, 0.6, 0.7), '#c4a575', -1.4, FIN[4] + 9.7, -112.1), P(box(0.7, 0.6, 0.7), '#c4a575', 1.4, FIN[4] + 9.7, -112.1), P(box(1.2, 1.8, 0.1), '#4a3a2c', 0, FIN[4] + 0.9, -111.75),
+        P(box(0.7, 1, 0.1), '#4a5a6a', 0, FIN[4] + 5.5, -111.75), P(cyl(0.05, 0.05, 2.4, 4), '#5b6470', 0, FIN[4] + 10.7, -113.5), P(box(1.2, 0.7, 0.04), '#f2b632', 0.6, FIN[4] + 11.4, -113.5),
+        P(box(0.5, 3.4, 0.5), '#9aa0a6', -2.6, FIN[4] + 1.7, -108.5), P(box(0.5, 3.4, 0.5), '#9aa0a6', 2.6, FIN[4] + 1.7, -108.5), P(box(5.7, 0.5, 0.6), '#e63946', 0, FIN[4] + 3.6, -108.5)]), vmat));
+      var gate = new THREE.Mesh(new THREE.PlaneGeometry(4.7, 3.2), beamMat); gate.position.set(0, FIN[4] + 1.6, -108.5); gate.renderOrder = 2; grp.add(gate);
+      // Arran on the horizon (seen through the haze near the finish).
+      grp.add(inst(merge([P(new THREE.ConeGeometry(1, 1, 7), '#5d6f8c', 0, 0.5, 0)]), vmat, [[-70, 22, 40], [-40, 30, 30], [-10, 18, 34], [25, 12, 30]].map(function (a) { return { x: a[0], y: SEA, z: -175, sx: a[2], sy: a[1], sz: 16 }; })));
+      var exit = { x: 0, z: -108.5, open: false, msg: 'All Westies found! The gate is open, run for the tower!', won: 'Clank made it!',
+        openIt: function () { exit.open = true; gate.visible = false; var n = boxes.indexOf(gateBox); if (n >= 0) boxes.splice(n, 1); } };
+      // Westies on plinths stood on platforms (the plinths are not solid, Clank collects them on the way past).
+      var ON = [2, 3, 4, 6, 7, 8, 10, 12];
+      var statues = makeStatues(ON.map(function (i) { var g = new THREE.Group(); g.position.y = PL[i][4]; grp.add(g); return [PL[i][0], PL[i][1], g, []]; }), grp, [], rng(2011));
+      statues.forEach(function (s, n) { s.y = PL[ON[n]][4]; });
+
+      // Wee Clank (faces +x like the Westie). Booster flame + exhaust puffs show while boosting or hovering.
+      var avatar = new THREE.Group(), steel = '#9aa4ad', teal = '#2a9d8f', orange = '#f28c28', ink = '#3b2416';
+      var clank = new THREE.Mesh(merge([
+        P(ball(0.17), '#1f6f66', 0.05, 0.08, 0.18, null, [1.3, 0.6, 1]), P(ball(0.17), '#1f6f66', 0.05, 0.08, -0.18, null, [1.3, 0.6, 1]),
+        P(cyl(0.07, 0.07, 0.32), steel, 0, 0.28, 0.18), P(cyl(0.07, 0.07, 0.32), steel, 0, 0.28, -0.18),
+        P(cyl(0.36, 0.42, 0.56, 14), orange, 0, 0.72, 0), P(cyl(0.14, 0.14, 0.05, 12), '#ffd23f', 0.39, 0.7, 0, [0, 0, Math.PI / 2]), P(cyl(0.43, 0.43, 0.08, 14), '#c8102e', 0, 0.98, 0),
+        P(cyl(0.06, 0.06, 0.36), teal, 0.02, 0.72, 0.47, [0.35, 0, 0]), P(cyl(0.06, 0.06, 0.36), teal, 0.02, 0.72, -0.47, [-0.35, 0, 0]),
+        P(ball(0.09), orange, 0.02, 0.54, 0.53), P(ball(0.09), orange, 0.02, 0.54, -0.53),
+        P(ball(0.36, 16, 12), '#8fe3cf', 0, 1.32, 0, null, [1, 0.85, 1.1]), P(ball(0.27, 14, 10), '#fff4dc', 0.24, 1.3, 0, null, [0.4, 0.8, 1]),
+        P(ball(0.055), ink, 0.34, 1.36, 0.1), P(ball(0.055), ink, 0.34, 1.36, -0.1), P(ball(0.018), '#ffffff', 0.385, 1.38, 0.085), P(ball(0.018), '#ffffff', 0.385, 1.38, -0.115),
+        P(ball(0.04), '#ff8fa3', 0.32, 1.26, 0.18), P(ball(0.04), '#ff8fa3', 0.32, 1.26, -0.18), P(new THREE.TorusGeometry(0.06, 0.014, 4, 10, Math.PI), ink, 0.345, 1.27, 0, [0, Math.PI / 2, Math.PI]),
+        P(cyl(0.1, 0.1, 0.08, 10), teal, 0, 1.32, 0.38, [Math.PI / 2, 0, 0]), P(cyl(0.1, 0.1, 0.08, 10), teal, 0, 1.32, -0.38, [Math.PI / 2, 0, 0]),
+        P(cyl(0.02, 0.02, 0.32, 5), steel, 0, 1.74, 0), P(ball(0.08), '#ffd23f', 0, 1.92, 0),
+        P(box(0.22, 0.42, 0.42), '#b8c2cc', -0.42, 0.78, 0), P(cyl(0.08, 0.11, 0.14, 10), '#5b6470', -0.45, 0.52, 0)]), vmat);
+      clank.castShadow = true; avatar.add(clank); avatar.scale.setScalar(0.8);
+      var flameMat = new THREE.MeshBasicMaterial({ color: 0xffa62b, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false });
+      var flame = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.55, 10).rotateX(Math.PI).translate(0, -0.27, 0), flameMat);
+      var core = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.3, 8).rotateX(Math.PI).translate(0, -0.15, 0), new THREE.MeshBasicMaterial({ color: 0xfff3c4, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+      flame.add(core); flame.position.set(-0.45, 0.45, 0); flame.visible = false; avatar.add(flame);
+      var PN = 40, pPos = new Float32Array(PN * 3), pLife = new Float32Array(PN), pNext = 0, pGeo = new THREE.BufferGeometry();
+      for (k = 0; k < PN; k++) pPos[k * 3 + 1] = -99;
+      pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+      var puffs = new THREE.Points(pGeo, new THREE.PointsMaterial({ size: 0.4, map: spMat.map, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffa040 }));
+      puffs.frustumCulled = false; grp.add(puffs);
+      // Gulls glide to and fro across some gaps at jumping height.
+      var gullGeo = merge([P(ball(0.3, 10, 8), '#ffffff', 0, 0, 0, null, [1.6, 0.8, 0.9]), P(box(0.5, 0.05, 1.6), '#c9ced6', -0.05, 0.08, 0), P(ball(0.16), '#ffffff', 0.45, 0.12, 0), P(new THREE.ConeGeometry(0.06, 0.2, 5), '#f4a020', 0.65, 0.1, 0, [0, 0, -Math.PI / 2]), P(ball(0.03), '#111111', 0.55, 0.18, 0.1), P(ball(0.03), '#111111', 0.55, 0.18, -0.1)]);
+      var gulls = [[0, -21.5, 3.3, 4, 0.7], [8, -77.5, 4.6, 5, 0.9], [-4, -94.5, 3.4, 4, 1.1], [4, -50, 3.2, 6, 0.6]].map(function (g, n) {
+        var m = new THREE.Mesh(gullGeo, vmat); m.castShadow = true; grp.add(m); return { m: m, x0: g[0], z: g[1], y: g[2], a: g[3], w: g[4], ph: n * 1.3 };
+      });
+      var told = false;
+
+      function tick(dt) {
+        // booster: flame flickers, puffs drift down and fade
+        var on = state === 'play' && (boostT > 0 || hovering);
+        flame.visible = on; if (on) { flame.scale.set(1, 0.7 + Math.random() * 0.6, 1); flameMat.opacity = hovering ? 0.75 + Math.random() * 0.2 : 0.95; }
+        if (on) {
+          var a = player.rotation.y, i = pNext++ % PN;
+          pPos[i * 3] = px - Math.cos(a) * 0.36 + (Math.random() - 0.5) * 0.1; pPos[i * 3 + 1] = py + 0.2; pPos[i * 3 + 2] = pz + Math.sin(a) * 0.36 + (Math.random() - 0.5) * 0.1; pLife[i] = 0.5;
+        }
+        for (k = 0; k < PN; k++) if (pLife[k] > 0) { pLife[k] -= dt; pPos[k * 3 + 1] -= 2.5 * dt; if (pLife[k] <= 0) pPos[k * 3 + 1] = -99; }
+        pGeo.attributes.position.needsUpdate = true;
+        gulls.forEach(function (g) {
+          var s = Math.sin(T * g.w + g.ph), x = g.x0 + s * g.a;
+          g.m.position.set(x, g.y + Math.sin(T * 3 + g.ph) * 0.15, g.z); g.m.rotation.y = Math.cos(T * g.w + g.ph) > 0 ? 0 : Math.PI;
+          if (state === 'play' && inv <= 0 && Math.abs(px - x) < 0.9 && Math.abs(pz - g.z) < 0.9 && Math.abs(py + 0.7 - g.y) < 0.9) { hurt(px - x, 0); kx *= 0.3; }
+        });
+        if (state === 'play' && !told && safe === HOVER_PL) { told = true; toast('Big gap! Jump, jump again in the air, then HOLD jump to hover'); }
+      }
+      return {
+        key: 'robot', title: "Wee Clank's Leap", group: grp, boxes: boxes, statues: statues, start: [0, 7], cam: { h: 7, b: 11 }, exit: exit, avatar: avatar, sea: SEA,
+        groundAt: groundAt, walls: walls,
+        env: { top: '#5fa8e0', sky: 0xcfe6f5, near: 60, far: 170, hemi: 0.75, hemiSky: 0xffffff, ground: 0x4f7fa0, sun: 0.9, sunCol: 0xfff1dc, exposure: 0.9 },
+        slow: function () { return false; }, tick: tick,
+        reset: function () { told = false; exit.open = false; gate.visible = true; if (boxes.indexOf(gateBox) < 0) boxes.push(gateBox); flame.visible = false; for (k = 0; k < PN; k++) { pLife[k] = 0; pPos[k * 3 + 1] = -99; } }
+      };
+    }
+
     // ---- Player: the sculpted Westie from statue.js (design 0, plain white), with a red collar and a soft contact shadow.
     // It shares the decimated statue geometry, so it costs one extra draw call. Animation is a trotting bob, nose rock and turn lean.
     var player = new THREE.Group(), body = new THREE.Group(); player.add(body);
@@ -1939,14 +2061,17 @@
       { key: 'hogmanay', title: 'Hogmanay Snow', sub: '10 Westies · ice, snowballs', stars: [160, 260], best: BEST_KEY + '-hogmanay', build: function () { return buildTown(true); } },
       { key: 'racecourse', title: 'Ayr Racecourse', sub: '8 Westies · horses, gates', stars: [110, 190], best: BEST_KEY + '-racecourse', build: function () { return buildRacecourse(); } },
       { key: 'harbour', title: 'Harbour at Night', sub: '8 Westies · torch, forklift', stars: [130, 220], best: BEST_KEY + '-harbour', build: function () { return buildHarbour(); } },
-      { key: 'winterpark', title: 'Snowy Park', sub: '10 Westies · snowmen, dogs', stars: [150, 240], best: BEST_KEY + '-winterpark', build: function () { return buildWinterPark(); } }
+      { key: 'winterpark', title: 'Snowy Park', sub: '10 Westies · snowmen, dogs', stars: [150, 240], best: BEST_KEY + '-winterpark', build: function () { return buildWinterPark(); } },
+      { key: 'robot', title: "Wee Clank's Leap", sub: '8 Westies · jump, boost, hover', stars: [100, 170], best: BEST_KEY + '-robot', build: function () { return buildRobot(); } }
     ];
     var LV = {}, KEYS = {}, STARS = {};
     LEVELS.forEach(function (l, i) { LV[l.key] = l; l.next = LEVELS[i + 1]; KEYS[l.key] = l.best; STARS[l.key] = l.stars; });
     function starsFor(key, t) { return t === null ? 0 : t <= STARS[key][0] ? 3 : t <= STARS[key][1] ? 2 : 1; }
     function setLevel(key) {
       var def = LV[key], lv = def.fresh ? def.build() : (levels[key] = levels[key] || def.build());
-      if (L && L !== lv) { scene.remove(L.group); if (LV[L.key].fresh) disposeTree(L.group, KEEP); }
+      if (L && L !== lv) { scene.remove(L.group); if (LV[L.key].fresh) disposeTree(L.group, KEEP); if (L.avatar) body.remove(L.avatar); }
+      if (lv.avatar) body.add(lv.avatar); model.visible = ghost.visible = !lv.avatar; // Wee Clank replaces the Westie
+      root.classList.toggle('wg-robot', !!lv.groundAt);
       levels[key] = lv; L = lv; scene.add(lv.group);
       var e = lv.env; if (scene.background) scene.background.dispose();
       scene.background = skyTex(e.top, '#' + new THREE.Color(e.sky).getHexString()); scene.fog.color.set(e.sky); scene.fog.near = e.near; scene.fog.far = e.far;
@@ -1996,7 +2121,7 @@
         var st = starsFor(L.key, Math.floor(time)), stars = '', i;
         for (i = 0; i < 3; i++) stars += '<span' + (i < st ? ' class="wg-got"' : '') + ' style="animation-delay:' + (0.15 + i * 0.18) + 's">★</span>';
         var nx = LV[L.key].next && [LV[L.key].next.key, LV[L.key].next.title];
-        html = '<p class="wg-kicker">Level complete</p><h2>' + (L.exit ? 'Out of the maze!' : 'All Westies found!') + '</h2><div class="wg-bigstars" aria-label="' + st + ' of 3 stars">' + stars + '</div>' +
+        html = '<p class="wg-kicker">Level complete</p><h2>' + (L.exit ? L.exit.won || 'Out of the maze!' : 'All Westies found!') + '</h2><div class="wg-bigstars" aria-label="' + st + ' of 3 stars">' + stars + '</div>' +
           '<div class="wg-stats"><div><small>Time</small><b>' + fmt(time) + '</b></div><div><small>' + (newBest && prevBest !== null ? 'New best!' : 'Best') + '</small><b>' + (b !== null ? fmt(b) : '–') + '</b></div></div>' +
           (nx ? '<button class="wg-go" data-act="' + nx[0] + '">Next level: ' + nx[1] + '</button><button class="wg-go wg-alt" data-act="restart">Play again</button>'
             : '<button class="wg-go" data-act="restart">Play again</button>' + menu) + LEAVE;
@@ -2021,6 +2146,7 @@
       if (LV[key].fresh || key !== L.key) setLevel(key); // mazes are fresh every run
       reset(); state = 'play'; showScreen(null); draw(); run();
       music.tempo(0); music.play(key); music.sfx('bark'); moveHint();
+      if (L.groundAt) toast(root.classList.contains('wg-touch') ? 'Tap the arrow button to jump. Tap again in the air to boost!' : 'Space to jump. Press again in the air to boost, hold to hover!');
     }
     function end(kind) {
       state = kind; stop(); keys = {};
@@ -2039,25 +2165,26 @@
     }
     function collect(st) {
       st.found = true; found++; st.beam.visible = false; st.skin.emissiveIntensity = 0; st.pop = 1;
-      burst(st.x, (L.y || 0) + 1.6, st.z); music.duck(); music.sfx('chime');
+      burst(st.x, (st.y !== undefined ? st.y : L.y || 0) + 1.6, st.z); music.duck(); music.sfx('chime');
       hud();
       var what = L.numbered ? 'No. ' + (st.id + 1) + ' — ' + st.name : 'Found: ' + st.name + '!';
       if (found < L.statues.length) toast(what);
-      else if (L.exit) { L.exit.openIt(); music.sfx('gate'); toast('All found! The gate is open — head for the exit!'); }
+      else if (L.exit) { L.exit.openIt(); music.sfx('gate'); toast(L.exit.msg || 'All found! The gate is open — head for the exit!'); }
       else { toast(what); end('win'); }
     }
     function reset() {
       time = 0; lives = LIVES; found = 0; inv = 2; vx = vz = kx = kz = 0; keys = {}; climb = null; ladderLock = false; shake = 0;
       L.statues.forEach(function (s) { s.found = false; s.pop = 0; s.beam.visible = true; s.skin.emissiveIntensity = 0.3; s.dog.position.y = 0.6; });
       L.reset(); px = L.start[0]; pz = L.start[1];
+      py = vy = airT = boostT = 0; jumps = 0; fuel = 1; grounded = true; hovering = jumpPress = false; safe = L.groundAt ? L.groundAt(px, pz, 1) : null;
       player.rotation.y = 0; player.visible = true; shownSec = -1; timeEl.textContent = fmt(0); hud(); place(1, 0);
     }
 
     var camBase = new THREE.Vector3(), climbY = 0, lookX = 0, lookZ = 0, portrait = true;
     function place(snap, dt) {
       var fy = L.y || 0;
-      player.position.set(px, fy + climbY, pz);
-      var ch = L.cam.h * camScale, cb = L.cam.b * camScale, k = snap ? 1 : 1 - Math.exp(-5 * dt), ty = fy + climbY * 0.6;
+      player.position.set(px, fy + climbY + py, pz);
+      var ch = L.cam.h * camScale, cb = L.cam.b * camScale, k = snap ? 1 : 1 - Math.exp(-5 * dt), ty = fy + climbY * 0.6 + py * 0.8;
       // Look ahead of the dog in its direction of travel, and aim a little north so the dog sits lower on screen.
       var kl = snap ? 1 : 1 - Math.exp(-2.2 * dt), ahead = portrait ? 2.6 : 3.4;
       lookX += (vx / SPEED * ahead - lookX) * kl; lookZ += (vz / SPEED * ahead - lookZ) * kl;
@@ -2067,9 +2194,33 @@
       shake *= Math.exp(-7 * (dt || 0));
       cam.position.set(camBase.x + sx, camBase.y + sy, camBase.z);
       cam.lookAt(camBase.x + sx, camBase.y - ch + 0.8 + sy, camBase.z - cb);
-      sun.position.set(px + 14, fy + 30, pz + 8); sun.target.position.set(px, fy, pz);
+      sun.position.set(px + 14, fy + py + 30, pz + 8); sun.target.position.set(px, fy + py, pz);
     }
 
+    // Run-and-jump physics (Wee Clank's Leap): first jump from the ground (or just after walking off an edge), a second jump in the air
+    // fires the booster, and holding jump after that hovers at HOVER_V until the fuel is used up. Landing refills the fuel.
+    function jumpStep(dt) {
+      var gp = L.groundAt(px, pz, py + 0.4), gy = gp ? gp[4] : -99;
+      if (grounded && gy < py - 0.05) { grounded = false; airT = 0; jumps = 0; } // walked off an edge
+      airT += dt; boostT = Math.max(0, boostT - dt);
+      if (jumpPress && state === 'play') {
+        if (grounded || (jumps === 0 && airT < 0.12)) { vy = JUMP_V; jumps = 1; grounded = false; airT = 1; music.sfx('hop'); }
+        else if (jumps < 2) { vy = JUMP_V2; jumps = 2; boostT = 0.3; music.sfx('boost'); }
+      }
+      jumpPress = false;
+      hovering = !grounded && jumps === 2 && !!keys.j && fuel > 0 && vy <= 0;
+      if (hovering) { vy += (HOVER_V - vy) * Math.min(1, dt * 10); fuel = Math.max(0, fuel - dt / HOVER_T); }
+      else if (!grounded) vy -= GRAV * dt;
+      if (!grounded) {
+        py += vy * dt;
+        if (vy <= 0 && gp && py <= gy) { py = gy; vy = 0; grounded = true; jumps = 0; fuel = 1; safe = gp; }
+      } else if (gp) { py = gy; safe = gp; } // small step up
+      if (py < L.sea - 1.2 && state === 'play') { // splash: lose a heart (unless still flashing) and go back to the last platform
+        music.sfx('splash');
+        if (inv <= 0) hurt(0, 0);
+        if (state === 'play') { px = safe[0]; pz = safe[1]; py = safe[4]; vy = vx = vz = kx = kz = 0; grounded = true; jumps = 0; fuel = 1; inv = Math.max(inv, 1); }
+      }
+    }
     function update(dt) {
       time += dt; T += dt;
       tickSparks(dt);
@@ -2093,7 +2244,9 @@
         var kk = Math.min(1, dt * (L.slide && L.slide(px, pz) ? 1.5 : 12)); vx += (ix * sp - vx) * kk; vz += (iz * sp - vz) * kk;
         var kd = Math.exp(-5 * dt); kx *= kd; kz *= kd;
         var mx = (vx + kx) * dt, mz = (vz + kz) * dt, ns = Math.max(1, Math.ceil(Math.hypot(mx, mz) / (PR * 0.5)));
-        for (var si = 0; si < ns; si++) { var p = collide(px + mx / ns, pz + mz / ns, PR, L.boxes); px = p[0]; pz = p[1]; }
+        var wb = L.walls ? L.walls(py) : L.boxes;
+        for (var si = 0; si < ns; si++) { var p = collide(px + mx / ns, pz + mz / ns, PR, wb); px = p[0]; pz = p[1]; }
+        if (L.groundAt) jumpStep(dt);
         speed = Math.hypot(vx, vz);
         if (speed > 0.4) player.rotation.y = lerpAngle(player.rotation.y, Math.atan2(-vz, vx), Math.min(1, dt * 12));
         walk += dt * (2 + speed * 1.6);
@@ -2101,7 +2254,7 @@
         // trot: bob and nose rock with the stride; lean into turns
         var turn = lerpAngle(0, player.rotation.y - lastHeading, 1) / Math.max(dt, 1e-3); lastHeading = player.rotation.y;
         lean += (Math.max(-0.22, Math.min(0.22, -turn * 0.05)) - lean) * Math.min(1, dt * 8);
-        body.position.y = Math.abs(Math.sin(walk)) * 0.13 * Math.min(1, speed / 3);
+        body.position.y = grounded ? Math.abs(Math.sin(walk)) * 0.13 * Math.min(1, speed / 3) : 0;
         body.rotation.z = sw * 0.08 + (speed < 0.3 ? Math.sin(T * 2.2) * 0.025 : 0); body.rotation.x = lean;
         if (L.ladderAt && state === 'play') {
           var lad = L.ladderAt(px, pz, ladderLock ? 1.5 : 0.9);
@@ -2114,6 +2267,10 @@
         }
       }
       blob.visible = !climb;
+      if (L.groundAt) {
+        var under = L.groundAt(px, pz, py + 0.4); blob.position.y = (under ? under[4] : L.sea) - py + 0.03; // shadow stays on the ground below
+        var fq = Math.round(fuel * 50) / 50; if (fq !== shownFuel) { shownFuel = fq; fuelEl.style.transform = 'scaleX(' + fq + ')'; }
+      } else blob.position.y = 0.03;
       if (inv > 0) { inv -= dt; player.visible = inv <= 0 || Math.floor(inv * 12) % 2 === 0; }
 
       L.tick(dt);
@@ -2133,7 +2290,7 @@
         s.skin.emissiveIntensity = 0.12 + 0.12 * Math.sin(T * 3 + s.ph) + (s.flash || 0);
         if (s.floor !== here || climb) return;
         var d = Math.hypot(px - s.x, pz - s.z);
-        if (d < 2.3 && state === 'play') collect(s);
+        if (d < 2.3 && state === 'play' && (s.y === undefined || Math.abs(py - s.y) < 2.2)) collect(s);
         else if (d < nd) { nd = d; near = s; }
       });
       beamMat.opacity = 0.1 + 0.05 * Math.sin(T * 2.5);
@@ -2172,11 +2329,11 @@
     }
     function resume() { if (state === 'pause') { state = 'play'; showScreen(null); run(); music.resume(); } }
 
-    var KEYMAP = { ArrowUp: 'u', w: 'u', W: 'u', ArrowDown: 'd', s: 'd', S: 'd', ArrowLeft: 'l', a: 'l', A: 'l', ArrowRight: 'r', d: 'r', D: 'r' };
+    var KEYMAP = { ArrowUp: 'u', w: 'u', W: 'u', ArrowDown: 'd', s: 'd', S: 'd', ArrowLeft: 'l', a: 'l', A: 'l', ArrowRight: 'r', d: 'r', D: 'r', ' ': 'j', j: 'j', J: 'j' };
     function typing(e) { var t = e.target; return t && t !== document.body && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable); }
     function onKey(e) {
       if (typing(e) || !root.offsetParent || !root.clientWidth) return;
-      if (state === 'play' && KEYMAP[e.key]) { keys[KEYMAP[e.key]] = e.type === 'keydown'; e.preventDefault(); }
+      if (state === 'play' && KEYMAP[e.key]) { var kn = KEYMAP[e.key], kdn = e.type === 'keydown'; if (kn === 'j' && kdn && !keys.j) jumpPress = true; keys[kn] = kdn; e.preventDefault(); }
       else if (e.type === 'keydown' && (e.key === 'p' || e.key === 'P' || e.key === 'Escape')) { if (state === 'play') pause(); else if (state === 'pause' && e.key !== 'Escape') resume(); }
     }
     function onBlur() { keys = {}; }
@@ -2184,6 +2341,14 @@
     window.addEventListener('keydown', onKey); window.addEventListener('keyup', onKey); window.addEventListener('blur', onBlur);
     document.addEventListener('visibilitychange', onVis);
     $('.wg-pause').onclick = pause;
+    // Jump button (Wee Clank's Leap, touch screens): press = jump, keep holding after the second jump = hover.
+    var jumpBtn = $('.wg-jump'), fuelEl = $('.wg-fuel i');
+    jumpBtn.addEventListener('pointerdown', function (e) {
+      e.preventDefault(); if (state !== 'play') return;
+      if (!keys.j) jumpPress = true; keys.j = true; jumpBtn.classList.add('wg-down');
+      try { jumpBtn.setPointerCapture(e.pointerId); } catch (er) { /* synthetic events */ }
+    });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (t) { jumpBtn.addEventListener(t, function () { keys.j = false; jumpBtn.classList.remove('wg-down'); }); });
 
     // Floating joystick: appears under the thumb anywhere on the left 45% of the screen.
     var joyMax = 45, jcx = 0, jcy = 0;
@@ -2234,7 +2399,7 @@
 
     setLevel('town'); reset(); resize(); showScreen('start');
     // Test-only hook (game-test.html sets the flag first); not part of the API.
-    if (window.WESTIE_GAME_DEBUG) window.WESTIE_GAME_DEBUG = { level: function () { return L; }, warp: function (x, z) { px = x; pz = z; place(1, 0); }, collect: function (n) { L.statues.slice(0, n).forEach(function (s) { if (!s.found) collect(s); }); }, floor: function (n) { if (L.setFloor) { L.setFloor(n); hud(); } }, music: music };
+    if (window.WESTIE_GAME_DEBUG) window.WESTIE_GAME_DEBUG = { level: function () { return L; }, warp: function (x, z, y) { px = x; pz = z; if (y !== undefined) { py = y; vy = 0; grounded = false; jumps = 0; } place(1, 0); }, robot: function () { return { py: py, vy: vy, jumps: jumps, fuel: fuel, grounded: grounded, hovering: hovering, boostT: boostT, lives: lives, state: state, px: px, pz: pz }; }, collect: function (n) { L.statues.slice(0, n).forEach(function (s) { if (!s.found) collect(s); }); }, floor: function (n) { if (L.setFloor) { L.setFloor(n); hud(); } }, music: music };
 
     return {
       // The host may pause on the menu too (tab switch): always silence; resume() restarts menu music if not mid-game.

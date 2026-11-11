@@ -99,6 +99,7 @@ nav .collect.on{color:var(--ink)}
 .tile .check{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-weight:700}
 .tile:not(.got) .pic{filter:saturate(.45) brightness(1.05)}
 .empty{padding:40px 16px;text-align:center;color:var(--muted)}
+.savecode{font:800 1.35rem/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:1px;text-align:center;user-select:all;margin:4px 0;word-break:break-all}
 
 /* collect */
 .collect-v{display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px 16px}
@@ -324,13 +325,10 @@ body[data-tab=game]:not(:has(.wg-screen.wg-on)) #game-exit{bottom:calc(12px + en
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<!-- three.js, the 3D model and game.js load on demand (need3d / needGame below), so launch does no 3D work -->
 <script src="locations.js"></script>
-<script src="model/westie-model.js"></script>
 <script src="photos/photos.js"></script>
 <script src="statue.js"></script>
-<script src="game.js"></script>
 <script>
 // Statue 2, Ayr Central: shopping design, slotted in after statue 1 (designs are matched to stops by position)
 WestieStatue.designs.splice(1, 0, {
@@ -357,7 +355,7 @@ WestieStatue.designs.forEach((d, i) => d.id = i);
 const LOCS = window.LOCATIONS, D = WestieStatue.designs, N = LOCS.length;
 // 4-digit code on each plaque, by stop. shortcut: codes live in page source, move server-side if prizes are at stake.
 // Bump on every publish; shown on the Progress tab.
-const APP_VERSION = '1.7';
+const APP_VERSION = '1.10';
 // offline: sw.js caches the app; its cache name comes from ?v=, so bumping APP_VERSION also refreshes the cache
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js?v=' + APP_VERSION).catch(e => console.warn('service worker', e));
 const CODES = ['4821','1739','6054','2917','8362','5408','3176','9625','7043','1588','6297','4130','8814','2569','7351','3942','5786','9013','1264','6679','3508','8247','4695','2031','7920','5317','9468','1852','6143','3790','8576'];
@@ -369,25 +367,22 @@ let found = load('westie-found2', {}), favs = load('westie-favs', {}), quizzes =
 const count = () => Object.keys(found).length;
 const paws = () => Object.values(quizzes).filter(Boolean).length;
 const CERT = /[?&]cert=1/.test(location.search); // test hook: show the certificate button before all are found
-const thumbs = D.map(d => WestieStatue.thumb(d.id, 300));
-// Statue pictures: each design rendered on its plinth (transparent PNG) over the stop's street photo.
-// Pattern swatch shows until the render is ready; renders run one at a time in the background.
-const shots = [];
+// Statue pictures: thumbs/NN.webp, each design pre-rendered on its plinth (transparent) at build time
+// by the same statue.js 3D code, so launch renders nothing in 3D. Re-render them if a design changes.
+const thumbs = D.map((d, i) => `thumbs/${String(i + 1).padStart(2, '0')}.webp`);
 const photo = i => { const p = (window.PHOTO_CREDITS || []).find(p => p.n === i + 1); return p ? `photos/thumbs/${p.file.split('/').pop()}` : ''; };
-const pic = (i, cls = '') => `<span class="pic ${cls}">${photo(i) ? `<img class="bg" src="${photo(i)}" alt="" loading="lazy" decoding="async">` : ''}<img data-pic="${i}" src="${shots[i] || thumbs[i]}" alt="${esc(D[i].name)}, statue No. ${i + 1}"><b class="code" aria-label="Plaque code ${CODES[i]}">${CODES[i]}</b></span>`;
-function renderShots() {
-  const box = document.createElement('div');
-  box.style.cssText = 'position:fixed;left:-2000px;top:0;width:360px;height:360px';
-  document.body.appendChild(box);
-  const v = WestieStatue.mount(box, 0);
-  let i = 0;
-  (function next() {
-    if (i >= N) { v.dispose(); box.remove(); return; }
-    try { shots[i] = v.snap(i); } catch (e) { console.warn('statue snapshot failed', i, e); }
-    document.querySelectorAll(`img[data-pic="${i}"]`).forEach(img => img.src = shots[i] || thumbs[i]);
-    i++; setTimeout(next, 30);
-  })();
-}
+const pic = (i, cls = '') => `<span class="pic ${cls}">${photo(i) ? `<img class="bg" src="${photo(i)}" alt="" loading="lazy" decoding="async">` : ''}<img src="${thumbs[i]}" alt="${esc(D[i].name)}, statue No. ${i + 1}" loading="lazy" decoding="async"><b class="code" aria-label="Plaque code ${CODES[i]}">${CODES[i]}</b></span>`;
+// load scripts once, in order; the 3D viewer needs three.js + OrbitControls + the 1.9 MB model, the game also game.js
+const loaded = {};
+const need = (...srcs) => srcs.reduce((p, s) => p.then(() => loaded[s] = loaded[s] || new Promise((ok, no) => {
+  const el = document.createElement('script'); el.src = s; el.onload = ok;
+  el.onerror = () => { delete loaded[s]; el.remove(); no(new Error('could not load ' + s)); };
+  document.head.appendChild(el);
+})), Promise.resolve());
+const need3d = () => need('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js', 'model/westie-model.js');
+const needGame = () => need3d().then(() => need('game.js'));
+// ask the browser not to clear saved progress when space runs low (Safari may still clear it after ~7 days unused)
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 // splash: shown on first visit, and again from the header's ? button
@@ -407,7 +402,8 @@ function show(v) {
   // iPhone/iPad in Safari (not the home-screen app): tip to add it for full-screen play, until dismissed
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   $('a2hs').hidden = !(v === 'game' && ios && !navigator.standalone && !load('westie-a2hs-off', false));
-  if (v === 'game' && window.WestieGame) game ? game.resume() : (game = WestieGame.mount($('game')));
+  if (v === 'game') game ? game.resume() : needGame().then(() => { if (tab === 'game' && !game) game = WestieGame.mount($('game')); },
+    () => { $('game').innerHTML = '<p class="empty">The game could not load. Check your connection and open the Game tab again.</p>'; });
   else if (game) { game.dispose(); game = null; $('game').innerHTML = ''; } // any way out of the Game tab ends the run
 }
 history.replaceState({ v: 'map' }, '');
@@ -538,6 +534,13 @@ function progress() {
     <h3 class="sec">About the trail</h3>
     <div class="info"><p>${N} painted West Highland Terrier statues across Ayr and Alloway, each decorated by a different artist. Follow the dotted line on the map from Ayr Station to the Brig o' Doon.</p></div>
     <div class="info"><h3>Credits</h3><p>${WestieStatue.credit ? '3D model: ' + esc(WestieStatue.credit.replace(/\.$/, '')) + '. ' : ''}Street photos from Wikimedia Commons; each is credited on its Westie's page. Map tiles © Esri.</p><p style="opacity:.7">App version ${APP_VERSION}</p></div>
+    <h3 class="sec">Save my progress</h3>
+    <div class="info" style="display:grid;gap:8px">
+      <p style="font-size:.85rem">On iPhone, Safari and the Home Screen app keep separate progress, and Safari can clear it if the app is not used for about a week. Write this code down or keep the link, then use Restore to get your Westies, bonus paws and game stars back.</p>
+      <button class="btn y wide" id="savecode">Save my progress</button>
+      <div id="codeout" hidden></div>
+      <button class="btn ghost wide" id="restorebtn">Restore progress</button>
+    </div>
     <h3 class="sec">Reset progress</h3>
     <div class="info" style="display:grid;gap:8px">
       <button class="btn ghost wide" data-reset="trail">Reset trail collection</button>
@@ -547,6 +550,13 @@ function progress() {
     </div>`;
   document.querySelectorAll('[data-reset]').forEach(b => b.onclick = () => resetProgress(b.dataset.reset));
   $('share').onclick = share; $('paintbtn').onclick = openPaint;
+  $('savecode').onclick = () => {
+    const code = saveCode(), link = location.href.split('#')[0].split('?')[0] + '#p=' + code.replace(/-/g, ''), o = $('codeout');
+    o.hidden = false;
+    o.innerHTML = `<p class="savecode" aria-label="Save code">${code}</p><p style="font-size:.8rem;word-break:break-all">Or keep this link: <a href="${esc(link)}">${esc(link)}</a></p><button class="btn ghost wide" id="copylink">Copy link</button>`;
+    $('copylink').onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(() => toast('Link copied.'), () => toast(link));
+  };
+  $('restorebtn').onclick = () => { const s = prompt('Type your save code'); if (s) restoreCode(s); };
   if ($('cert')) $('cert').onclick = certificate;
 }
 // found values are Date.now() timestamps; anything else (older saves) has no date
@@ -560,7 +570,67 @@ function share() {
   const t = d.text + ' ' + d.url;
   (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('Copied! Paste it to share your progress.'), () => toast(t));
 }
+// ---------- save / restore code ----------
+// Format 2 (v1.9+): 24 Crockford base32 characters = 120 bits: format number 2, collected (31), bonus paws (31),
+// day of the last find since 1 Jan 2026 (12), game stars per level (2 bits x 16, 0 = not played), checksum (payload mod 251, 8).
+// Format 1 (v1.8): 21 characters, the same fields with stars for 10 levels (20 bits); still read, levels 11+ count as not played.
+// shortcut: no favourites and no per-Westie dates (restored finds all get the last-find day); use a new format number if more is needed.
+// Game levels in game.js order with its 3-star / 2-star seconds; append new levels at the end (max 16 in format 2).
+const GAME_LV = [['', 150, 240], ['-forest', 120, 210], ['-tower', 180, 300], ['-tower7', 480, 720], ['-beach', 150, 240], ['-alloway', 150, 240], ['-hogmanay', 160, 260], ['-racecourse', 110, 190], ['-harbour', 130, 220], ['-winterpark', 150, 240], ['-robot', 100, 170]];
+const CODE_FMT = { 21: [1, 20n], 24: [2, 32n] }; // code length: [format number, star bits]
+const B32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ', DAY0 = Date.UTC(2026, 0, 1), DAY = 864e5;
+const gameBest = k => { try { const v = localStorage.getItem('westie-game-best' + k), n = v === null ? NaN : Math.floor(+v); return isFinite(n) && n >= 0 ? n : null; } catch (e) { return null; } };
+const bitsOf = has => LOCS.reduce((b, l, i) => has(i) ? b | 1n << BigInt(i) : b, 0n);
+function saveCode() {
+  const ts = Object.values(found).filter(t => typeof t === 'number' && t > 1e12);
+  const day = Math.min(4095, Math.max(0, Math.floor(((ts.length ? Math.max(...ts) : Date.now()) - DAY0) / DAY)));
+  const stars = GAME_LV.reduce((b, [k, s3, s2], j) => { const t = gameBest(k); return b | BigInt(t === null ? 0 : t <= s3 ? 3 : t <= s2 ? 2 : 1) << BigInt(2 * j); }, 0n);
+  let v = (((2n << 31n | bitsOf(i => found[i])) << 31n | bitsOf(i => quizzes[i])) << 12n | BigInt(day)) << 32n | stars;
+  v = v << 8n | v % 251n;
+  let s = ''; for (let k = 0; k < 24; k++) { s = B32[Number(v & 31n)] + s; v >>= 5n; }
+  return s.match(/.{6}/g).join('-');
+}
+function readCode(s) {
+  s = String(s).toUpperCase().replace(/O/g, '0').replace(/[IL]/g, '1').replace(/[^0-9A-Z]/g, '');
+  const fmt = CODE_FMT[s.length]; if (!fmt) return null;
+  let v = 0n; for (const ch of s) { const d = B32.indexOf(ch); if (d < 0) return null; v = v * 32n + BigInt(d); }
+  const chk = v & 255n; v >>= 8n; if (v % 251n !== chk) return null;
+  const take = n => { const x = v & (1n << BigInt(n)) - 1n; v >>= BigInt(n); return x; };
+  const stars = take(fmt[1]), day = take(12), paw = take(31), got = take(31);
+  return v === BigInt(fmt[0]) ? { stars, day: Number(day), paw, got } : null;
+}
+// merges: never removes anything already on this phone
+function restoreCode(s) {
+  const r = readCode(s);
+  if (!r) return toast('That code isn\'t right. Check each letter and try again.'), false;
+  const t = DAY0 + r.day * DAY + 12 * 36e5; // midday, so the date is the same day in the UK
+  LOCS.forEach((l, i) => {
+    const b = 1n << BigInt(i);
+    if (r.got & b && !found[i]) found[i] = t;
+    if (r.paw & b) quizzes[i] = 1; else if (r.got & b && !(i in quizzes)) quizzes[i] = 0; // found Westies never ask their question again
+  });
+  GAME_LV.forEach(([k, s3, s2], j) => { // stars come back as the slowest time that still earns them
+    const n = Number(r.stars >> BigInt(2 * j) & 3n), t2 = [0, s2 + 1, s2, s3][n], cur = gameBest(k);
+    if (n && (cur === null || cur > t2)) try { localStorage.setItem('westie-game-best' + k, String(t2)); } catch (e) {}
+  });
+  store('westie-found2', found); store('westie-quiz', quizzes);
+  if (game) { game.dispose(); game = null; $('game').innerHTML = ''; } // game menu re-reads best times
+  render(); toast(`Progress restored: ${count()} of ${N} Westies, ${paws()} bonus paw${paws() === 1 ? '' : 's'}.`);
+  return true;
+}
+console.assert((() => { const f = found, q = quizzes; found = { 0: DAY0 + 5 * DAY, 30: DAY0 }; quizzes = { 0: 1, 30: 0 };
+  const c = saveCode(), r = readCode(c.toLowerCase()); found = f; quizzes = q;
+  return c.length === 27 && r && r.got === (1n | 1n << 30n) && r.paw === 1n && r.day === 5 && !readCode(c.replace(/^./, ch => ch === 'A' ? 'B' : 'A')); })(), 'save code round trip');
+// a real v1.8 code (found 0, 4, 31; paws on 0 and 31; last find day 300; stars: Town 3, Forest 2, Snowy Park 1) must still read
+console.assert((() => { const r = readCode('6000013-0000012-B2002ZP'); return r && r.got === (1n | 1n << 4n | 1n << 30n) && r.paw === (1n | 1n << 30n) && r.day === 300 && r.stars === (3n | 2n << 2n | 1n << 18n); })(), 'v1.8 save code still reads');
+// stars for the 11th level (Wee Clank's Leap) survive a format 2 round trip
+console.assert((() => { const k = 'westie-game-best-robot', old = localStorage.getItem(k); try { localStorage.setItem(k, '90'); } catch (e) { return true; }
+  const r = readCode(saveCode()); old === null ? localStorage.removeItem(k) : localStorage.setItem(k, old); return r && (r.stars >> 20n & 3n) === 3n; })(), 'save code carries level 11 stars');
+
 function certificate() {
+  const name = prompt('Name to print on the certificate (leave blank for none)', load('westie-name', ''));
+  if (name === null) return; // cancelled
+  const who = name.trim().slice(0, 40); store('westie-name', who);
   const W = 1200, H = 850, cv = document.createElement('canvas'), c = cv.getContext('2d');
   cv.width = W; cv.height = H;
   const g = c.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#14275a'); g.addColorStop(.6, '#2a4aa8'); g.addColorStop(1, '#8e5bb5');
@@ -570,12 +640,18 @@ function certificate() {
   const ts = Object.values(found).filter(t => typeof t === 'number' && t > 1e12);
   const date = new Date(ts.length ? Math.max(...ts) : Date.now()).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   c.textAlign = 'center'; c.fillStyle = '#fff';
-  c.font = '600 40px Fredoka, sans-serif'; c.fillText('CERTIFICATE OF ACHIEVEMENT', W / 2, 190);
-  c.fillStyle = '#f4b41a'; c.font = '700 76px Fredoka, sans-serif'; c.fillText('Westies of Ayr Trail Complete', W / 2, 330, W - 160);
+  // with a name: header, "Awarded to", name, then the rest moved down; without: the original layout
+  const y = who ? [150, 420, 510, 570, 680] : [190, 330, 440, 520, 640];
+  c.font = '600 40px Fredoka, sans-serif'; c.fillText('CERTIFICATE OF ACHIEVEMENT', W / 2, y[0]);
+  if (who) {
+    c.font = '500 32px Inter, sans-serif'; c.fillText('Awarded to', W / 2, 225);
+    c.fillStyle = '#f4b41a'; c.font = '700 84px Fredoka, sans-serif'; c.fillText(who, W / 2, 320, W - 200);
+  }
+  c.fillStyle = who ? '#fff' : '#f4b41a'; c.font = `700 ${who ? 58 : 76}px Fredoka, sans-serif`; c.fillText('Westies of Ayr Trail Complete', W / 2, y[1], W - 160);
   c.fillStyle = '#fff'; c.font = '500 36px Inter, sans-serif';
-  c.fillText(`All ${N} painted Westies found`, W / 2, 440);
-  c.fillText(date, W / 2, 520);
-  c.font = '600 44px Fredoka, sans-serif'; c.fillText(`🐾 ${paws()} bonus paw${paws() === 1 ? '' : 's'}`, W / 2, 640);
+  c.fillText(`All ${N} painted Westies found`, W / 2, y[2]);
+  c.fillText(date, W / 2, y[3]);
+  c.font = '600 44px Fredoka, sans-serif'; c.fillText(`🐾 ${paws()} bonus paw${paws() === 1 ? '' : 's'}`, W / 2, y[4]);
   download(cv.toDataURL('image/png'), 'westies-of-ayr-certificate.png');
 }
 
@@ -621,6 +697,9 @@ $('pal').onclick = e => { const b = e.target.closest('button'); if (!b) return; 
 function openPaint() {
   $('paint').classList.add('on');
   if (pv) return;
+  need3d().then(() => { if (!pv) mountPaint(); }, () => toast('Could not load the 3D Westie. Check your connection.'));
+}
+function mountPaint() {
   pv = WestieStatue.mount($('pstage'), 0); // starts as Classic White (design 0)
   // Paint a round blob at the texture spot under the finger; a drag that starts on the dog paints, elsewhere it turns.
   const dab = e => {
@@ -639,6 +718,7 @@ function openPaint() {
 $('p-close').onclick = () => $('paint').classList.remove('on');
 $('p-clear').onclick = () => pv && pv.setDesign(0);
 $('p-save').onclick = () => {
+  if (!pv) return; // 3D Westie still loading
   const gl = pv.render(), cv = document.createElement('canvas'), c = cv.getContext('2d'); // copy in the same task as the render
   cv.width = gl.width; cv.height = gl.height;
   const g = c.createRadialGradient(cv.width / 2, cv.height * .35, 0, cv.width / 2, cv.height * .35, cv.height * .8);
@@ -670,7 +750,12 @@ function open(i, fromHistory) {
   // real street photo of this stop behind the 3D statue (photos/NN.jpg); gradient if none
   const ph = (window.PHOTO_CREDITS || []).find(p => p.n === cur + 1);
   document.querySelector('.hero').style.setProperty('--photo', ph ? `url("photos/${ph.file.split('/').pop()}")` : 'none');
-  if (!viewer) viewer = WestieStatue.mount($('stage'), cur); else viewer.setDesign(cur);
+  // pre-rendered picture shows until the 3D viewer is ready (first open loads three.js + model)
+  if (viewer) viewer.setDesign(cur);
+  else {
+    $('stage').style.background = `url("${thumbs[cur]}") center/contain no-repeat`;
+    need3d().then(() => { if (!viewer) viewer = WestieStatue.mount($('stage'), cur); else viewer.setDesign(cur); $('stage').style.background = ''; }, e => console.warn(e));
+  }
   $('info').innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
       <span class="kicker${found[cur] ? ' got' : ''}">No. ${cur + 1}${found[cur] ? ' · Collected' : ''}</span>
@@ -740,9 +825,10 @@ function render() { $('prog').textContent = count() + ' / ' + N; pins(); grid();
 console.assert(D.length === N && CODES.length === N && new Set(CODES).size === N && CODES.every(c => /^\d{4}$/.test(c)), 'trail data mismatch');
 console.assert(D.every((d, i) => { const q = quiz(i), q2 = quiz(i); return new Set(q.opts).size === 3 && q.opts.includes(q.a) && q.opts.join() === q2.opts.join(); }), 'quiz: bad question');
 render();
-setTimeout(renderShots, 300);
 // index.html#s5 opens statue 5 (for QR codes on plinths)
 const h = location.hash.match(/^#s(\d+)$/); if (h) { $('splash').hidden = true; open(+h[1] - 1); }
+// index.html#p=CODE (the "Save my progress" link) merges that progress in, then drops the code from the address
+const hp = location.hash.match(/^#p=([0-9A-Za-z-]+)$/); if (hp) { history.replaceState(history.state, '', location.pathname + location.search); restoreCode(hp[1]); }
 </script>
 </body>
 </html>
